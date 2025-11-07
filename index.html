@@ -1,0 +1,2677 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InternLink'S - Temukan Magang Impianmu</title>
+    <!-- Tailwind CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <!-- Font Awesome untuk ikon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Warna kustom */
+        :root {
+            --pink-soft: #FCE7F3; /* bg-pink-100 */
+            --pink-medium: #FBCFE8; /* bg-pink-200 */
+            --pink-strong: #DB2777; /* text-pink-600, bg-pink-600 */
+            --pink-dark: #9D174D; /* hover:bg-pink-700 */
+        }
+
+        .bg-pink-soft { background-color: var(--pink-soft); }
+        .bg-pink-medium { background-color: var(--pink-medium); }
+        .bg-pink-strong { background-color: var(--pink-strong); }
+        .bg-pink-dark { background-color: var(--pink-dark); }
+        .text-pink-strong { color: var(--pink-strong); }
+        .border-pink-strong { border-color: var(--pink-strong); }
+
+        .btn-primary {
+            @apply bg-pink-strong text-white px-6 py-3 rounded-full hover:bg-pink-dark transition duration-300 shadow-lg;
+        }
+
+        .btn-secondary {
+            @apply bg-transparent border border-pink-strong text-pink-strong px-6 py-3 rounded-full hover:bg-pink-soft transition duration-300;
+        }
+
+        /* Styling tambahan untuk paginasi */
+        .pagination-link {
+            @apply px-4 py-2 mx-1 rounded-full border border-pink-strong text-pink-strong hover:bg-pink-soft transition duration-200;
+        }
+        .pagination-link.active {
+            @apply bg-pink-strong text-white;
+        }
+
+        /* Hide pages by default */
+        .page {
+            display: none;
+        }
+        .page.active {
+            display: block;
+        }
+
+        /* Custom Modal Styling */
+        .custom-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .custom-modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .custom-modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            transform: translateY(-20px);
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            position: relative;
+        }
+
+        .custom-modal-overlay.active .custom-modal-content {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .modal-close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #9CA3AF;
+        }
+
+        .modal-header {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--pink-strong);
+            margin-bottom: 1rem;
+        }
+
+        .modal-body {
+            margin-bottom: 1.5rem;
+            color: #4B5563;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .modal-button {
+            @apply bg-pink-strong text-white px-4 py-2 rounded-md hover:bg-pink-dark transition duration-300;
+        }
+
+        /* Apply form steps styling */
+        .step-indicator {
+            @apply flex items-center justify-center p-4 border-b-2;
+        }
+        .step-indicator.active {
+            @apply border-pink-strong text-pink-strong font-bold;
+        }
+        .step-indicator.completed {
+            @apply border-green-500 text-green-600 font-bold;
+        }
+
+        .apply-step {
+            display: none;
+        }
+        .apply-step.active {
+            display: block;
+        }
+
+        /* Profile Tabs Styling */
+        .tab-button.active-tab {
+            border-color: var(--pink-strong);
+            color: var(--pink-strong);
+            font-weight: 600;
+        }
+
+        /* Background image styling */
+        body {
+            background-image: url('image_d69d1c.png'); /* Menggunakan gambar yang diunggah */
+            background-size: cover; /* Menutupi seluruh area body */
+            background-position: center; /* Memusatkan gambar */
+            background-repeat: no-repeat; /* Mencegah pengulangan gambar */
+            background-attachment: fixed; /* Membuat gambar latar belakang tetap saat menggulir */
+        }
+    </style>
+</head>
+<body class="font-sans text-gray-800"> <!-- Removed bg-gray-50 from body to allow background image -->
+
+    <!-- Custom Modal Structure -->
+    <div id="customModal" class="custom-modal-overlay">
+        <div class="custom-modal-content">
+            <button class="modal-close-btn" onclick="closeModal()">&times;</button>
+            <div class="modal-header" id="modalHeader"></div>
+            <div class="modal-body" id="modalBody"></div>
+            <div class="modal-footer" id="modalFooter">
+                <button class="modal-button" onclick="closeModal()">Oke</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mentor Chat Modal Structure -->
+    <div id="mentorChatModal" class="custom-modal-overlay">
+        <div class="custom-modal-content max-w-xl"> <!-- Increased max-width for better chat layout -->
+            <button class="modal-close-btn" onclick="closeMentorChatModal()">&times;</button>
+            <div class="modal-header" id="mentorChatHeader"></div>
+            <div class="modal-body flex flex-col h-96"> <!-- Added flex-col and height for chat area -->
+                <div id="chatMessages" class="flex-grow overflow-y-auto p-4 border rounded-lg mb-4 bg-gray-50 text-sm">
+                    <!-- Chat messages will appear here -->
+                </div>
+                <div class="flex">
+                    <input type="text" id="chatInput" placeholder="Ketik pesan Anda..." class="flex-grow p-3 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-pink-strong">
+                    <button class="btn-primary rounded-l-none" id="sendChatMessage" onclick="sendChatMessage()">Kirim</button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-button" onclick="closeMentorChatModal()">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Applicants List Modal Structure -->
+    <div id="applicantsModal" class="custom-modal-overlay">
+        <div class="custom-modal-content max-w-xl">
+            <button class="modal-close-btn" onclick="closeApplicantsModal()">&times;</button>
+            <div class="modal-header" id="applicantsModalHeader"></div>
+            <div class="modal-body">
+                <p id="applicantsCount" class="text-gray-600 mb-4"></p>
+                <div id="applicantsList" class="space-y-3 max-h-60 overflow-y-auto">
+                    <!-- Applicant cards will be loaded here -->
+                </div>
+                <p id="noApplicantsMessageModal" class="text-center text-gray-500 mt-4 hidden">Belum ada pelamar untuk lowongan ini.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-button" onclick="closeApplicantsModal()">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="bg-white shadow-md py-4 sticky top-0 z-50">
+        <nav class="container mx-auto flex justify-between items-center px-4">
+            <!-- Logo -->
+            <a href="#home" class="flex items-center space-x-2" onclick="showPage('home')">
+                <img src="image_d45f3f.png" onerror="this.onerror=null;this.src='https://placehold.co/40x40/DB2777/ffffff?text=IL';" alt="InternLink'S Logo" class="h-10 w-auto"> <!-- Removed rounded-full, set width to auto -->
+                <span class="text-2xl font-bold text-pink-strong">InternLink'S</span>
+            </a>
+
+            <!-- Navigasi -->
+            <ul class="flex space-x-6">
+                <li><a href="#home" class="text-gray-600 hover:text-pink-strong transition duration-200" onclick="showPage('home')">Beranda</a></li>
+                <li id="findInternshipNav"><a href="#find-internship" class="text-gray-600 hover:text-pink-strong transition duration-200" onclick="showPage('find-internship')">Cari Magang</a></li>
+                <li><a href="#articles" class="text-gray-600 hover:text-pink-strong transition duration-200" onclick="showPage('articles')">Artikel & Tips</a></li>
+                <li><a href="#mentor" class="text-gray-600 hover:text-pink-strong transition duration-200" onclick="showPage('mentor')">Mentor</a></li>
+                <li id="profileNav" class="hidden"><a href="#profile" class="text-gray-600 hover:text-pink-strong transition duration-200" onclick="showPage('profile')">Profil</a></li>
+            </ul>
+
+            <!-- Tombol Login/Daftar/Logout -->
+            <div id="authButtons" class="flex space-x-4">
+                <button class="btn-secondary" onclick="showPage('login')">Login</button>
+                <button class="btn-primary" onclick="showPage('register')">Daftar</button>
+            </div>
+            <div id="loggedInUser" class="hidden items-center space-x-4">
+                <span id="loggedInUserName" class="font-semibold text-pink-strong"></span>
+                <button class="btn-secondary" onclick="logout()">Logout</button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content Area (Pages) -->
+    <main class="container mx-auto mt-8 px-4">
+
+        <!-- Home Page -->
+        <section id="home" class="page active">
+            <!-- Hero Section -->
+            <div class="bg-pink-soft py-20 px-6 rounded-lg text-center shadow-lg mb-12">
+                <h1 class="text-5xl font-extrabold text-gray-900 mb-4 leading-tight">Temukan <span class="text-pink-strong">Magang Impianmu</span> Bersama InternLink'S</h1>
+                <p class="text-xl text-gray-700 mb-8 max-w-2xl mx-auto">Jembatani impian karirmu dengan ribuan peluang magang terbaik dari perusahaan terkemuka.</p>
+                <div class="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4 mb-8">
+                    <input type="text" id="homeSearchInput" placeholder="Cari posisi, lokasi, atau perusahaan..." class="px-6 py-3 rounded-full border border-gray-300 w-full sm:w-96 focus:outline-none focus:ring-2 focus:ring-pink-strong">
+                    <button class="btn-primary" onclick="homeSearch()">Cari Magang</button>
+                </div>
+            </div>
+
+            <!-- Why Choose InternLink'S? -->
+            <div class="my-16">
+                <h2 class="text-4xl font-bold text-center text-gray-900 mb-10">Mengapa Memilih <span class="text-pink-strong">InternLink'S?</span></h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="bg-white p-8 rounded-lg shadow-md text-center transform hover:scale-105 transition duration-300">
+                        <i class="fas fa-search text-pink-strong text-4xl mb-4"></i>
+                        <h3 class="text-xl font-semibold mb-3">Pencarian Cerdas</h3>
+                        <p class="text-gray-600">Temukan magang yang sesuai dengan minat dan keahlianmu dengan filter yang akurat.</p>
+                    </div>
+                    <div class="bg-white p-8 rounded-lg shadow-md text-center transform hover:scale-105 transition duration-300">
+                        <i class="fas fa-building text-pink-strong text-4xl mb-4"></i>
+                        <h3 class="text-xl font-semibold mb-3">Ribuan Peluang</h3>
+                        <p class="text-gray-600">Akses database luas magang dari startup hingga perusahaan multinasional.</p>
+                    </div>
+                    <div class="bg-white p-8 rounded-lg shadow-md text-center transform hover:scale-105 transition duration-300">
+                        <i class="fas fa-handshake text-pink-strong text-4xl mb-4"></i>
+                        <h3 class="text-xl font-semibold mb-3">Siap Karir</h3>
+                        <p class="text-gray-600">Dapatkan tips dan panduan eksklusif untuk persiapan wawancara dan CV.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Latest/Recommended Internships -->
+            <div class="my-16">
+                <h2 id="homeInternshipSectionTitle" class="text-4xl font-bold text-center text-gray-900 mb-10">Lowongan Magang Terbaru</h2>
+                <div id="homeInternshipList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Internship cards will be loaded here by JS -->
+                </div>
+                <div class="text-center mt-12">
+                    <button class="btn-secondary" onclick="showPage('find-internship')">Lihat Semua Lowongan</button>
+                </div>
+            </div>
+
+            <!-- Testimonials -->
+            <div class="bg-pink-soft py-16 px-6 rounded-lg text-center shadow-lg my-16">
+                <h2 class="text-4xl font-bold text-gray-900 mb-10">Apa Kata Mereka?</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <p class="italic text-gray-700 mb-4">"InternLink'S membantu saya menemukan magang di perusahaan impian saya. Prosesnya mudah dan cepat!"</p>
+                        <p class="font-semibold text-pink-strong">- Sarah, Mahasiswa Ilmu Komputer</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <p class="italic text-gray-700 mb-4">"Panduan CV dan wawancara dari InternLink'S sangat membantu saya dalam mempersiapkan diri."</p>
+                        <p class="font-semibold text-pink-strong">- Budi, Mahasiswa Desain Grafis</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <p class="italic text-gray-700 mb-4">"Saya sangat merekomendasikan InternLink'S untuk semua mahasiswa yang mencari peluang magang."</p>
+                        <p class="font-semibold text-pink-strong">- Citra, Mahasiswa Manajemen</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- For Companies Section -->
+            <div class="my-16 text-center">
+                <h2 class="text-4xl font-bold text-gray-900 mb-6">Untuk Perusahaan</h2>
+                <p class="text-xl text-gray-700 mb-8 max-w-2xl mx-auto">Temukan talenta muda terbaik untuk kebutuhan magang di perusahaan Anda.</p>
+                <!-- Updated button for companies -->
+                <button class="btn-primary" onclick="showPage('add-job-posting')">Posting Lowongan Magang</button>
+            </div>
+        </section>
+
+        <!-- Find Internship Page -->
+        <section id="find-internship" class="page">
+            <h1 class="text-4xl font-bold text-gray-900 mb-8 text-center">Cari Peluang Magang</h1>
+
+            <div class="flex flex-col lg:flex-row gap-8">
+                <!-- Filter Section -->
+                <div class="lg:w-1/4 bg-white p-6 rounded-lg shadow-md h-fit sticky top-24">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">Filter</h2>
+
+                    <div class="mb-5">
+                        <label for="filterJurusan" class="block text-gray-700 font-semibold mb-2">Jurusan</label>
+                        <select id="filterJurusan" class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-strong">
+                            <option value="">Semua Jurusan</option>
+                            <option value="Informatika">Informatika</option>
+                            <option value="Desain Komunikasi Visual">Desain Komunikasi Visual</option>
+                            <option value="Manajemen Bisnis">Manajemen Bisnis</option>
+                            <option value="Ilmu Komunikasi">Ilmu Komunikasi</option>
+                            <option value="Akuntansi">Akuntansi</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-5">
+                        <label for="filterLokasi" class="block text-gray-700 font-semibold mb-2">Lokasi</label>
+                        <select id="filterLokasi" class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-strong">
+                            <option value="">Semua Lokasi</option>
+                            <option value="Jakarta">Jakarta</option>
+                            <option value="Bandung">Bandung</option>
+                            <option value="Surabaya">Surabaya</option>
+                            <option value="Yogyakarta">Yogyakarta</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-5">
+                        <label for="filterDurasi" class="block text-gray-700 font-semibold mb-2">Durasi (Bulan)</label>
+                        <select id="filterDurasi" class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-strong">
+                            <option value="">Semua Durasi</option>
+                            <option value="3">3 Bulan</option>
+                            <option value="6">6 Bulan</option>
+                            <option value="12">12 Bulan</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-5">
+                        <label for="filterType" class="block text-gray-700 font-semibold mb-2">Jenis Magang</label>
+                        <select id="filterType" class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-strong">
+                            <option value="">Semua Jenis</option>
+                            <option value="Berbayar">Berbayar</option>
+                            <option value="Tidak Berbayar">Tidak Berbayar</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-5">
+                        <label for="filterRemote" class="block text-gray-700 font-semibold mb-2">Mode Kerja</label>
+                        <select id="filterRemote" class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-strong">
+                            <option value="">Semua Mode</option>
+                            <option value="On-Site">On-Site</option>
+                            <option value="Remote">Remote</option>
+                            <option value="Hybrid">Hybrid</option>
+                        </select>
+                    </div>
+
+                    <div class="flex justify-between items-center mt-6">
+                        <button class="btn-primary flex-1 mr-2" onclick="applyFilters()">Terapkan Filter</button>
+                        <button class="btn-secondary flex-1 ml-2" onclick="resetFilters()">Reset Filter</button>
+                    </div>
+                </div>
+
+                <!-- Internship Listings -->
+                <div class="lg:w-3/4">
+                    <div class="flex justify-between items-center mb-6">
+                        <input type="text" id="findInternshipSearchInput" placeholder="Cari posisi, perusahaan..." class="px-4 py-2 rounded-full border border-gray-300 flex-grow mr-4 focus:outline-none focus:ring-2 focus:ring-pink-strong">
+                        <button class="btn-primary" onclick="searchInternships()">Cari</button>
+                    </div>
+
+                    <div class="text-gray-600 mb-4">Ditemukan <span id="internshipCount" class="font-bold text-pink-strong">0</span> lowongan.</div>
+                    <div id="internshipList" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Internship cards will be loaded here by JS -->
+                    </div>
+
+                    <!-- Pagination -->
+                    <div id="paginationControls" class="flex justify-center items-center mt-12 space-x-2">
+                        <!-- Pagination buttons will be loaded here by JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Internship Detail Page -->
+        <section id="internship-detail" class="page">
+            <button class="btn-secondary mb-6 flex items-center" onclick="showPage('find-internship')">
+                <i class="fas fa-arrow-left mr-2"></i> Kembali ke Pencarian
+            </button>
+            <div class="bg-white p-8 rounded-lg shadow-md">
+                <img id="detailCompanyLogo" src="https://placehold.co/100x100/DB2777/ffffff?text=Logo" alt="Company Logo" class="w-24 h-24 rounded-lg mb-6">
+                <h1 id="detailTitle" class="text-4xl font-bold text-gray-900 mb-2"></h1>
+                <p id="detailCompany" class="text-xl text-gray-700 mb-4"></p>
+                <div class="flex flex-wrap items-center text-gray-600 mb-6 space-x-4">
+                    <span id="detailLocation" class="flex items-center"><i class="fas fa-map-marker-alt mr-2 text-pink-strong"></i></span>
+                    <span id="detailDuration" class="flex items-center"><i class="fas fa-clock mr-2 text-pink-strong"></i></span>
+                    <span id="detailType" class="flex items-center"><i class="fas fa-wallet mr-2 text-pink-strong"></i></span>
+                    <span id="detailRemote" class="flex items-center"><i class="fas fa-desktop mr-2 text-pink-strong"></i></span>
+                    <span id="detailSalary" class="flex items-center"><i class="fas fa-money-bill-wave mr-2 text-pink-strong"></i></span>
+                    <span id="detailRegistrationPeriod" class="flex items-center"><i class="fas fa-calendar-alt mr-2 text-pink-strong"></i></span>
+                </div>
+
+                <div class="mb-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-3">Deskripsi Pekerjaan</h2>
+                    <p id="detailDescription" class="text-gray-700 leading-relaxed"></p>
+                </div>
+
+                <div class="mb-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-3">Kualifikasi</h2>
+                    <ul id="detailQualifications" class="list-disc list-inside text-gray-700 leading-relaxed"></ul>
+                </div>
+
+                <div class="mb-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-3">Tanggung Jawab</h2>
+                    <ul id="detailResponsibilities" class="list-disc list-inside text-gray-700 leading-relaxed"></ul>
+                </div>
+
+                <div class="text-right">
+                    <button class="btn-primary" onclick="showApplyModal()">Lamar Sekarang</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Apply Internship Modal -->
+        <div id="applyModal" class="custom-modal-overlay">
+            <div class="custom-modal-content max-w-2xl w-full">
+                <button class="modal-close-btn" onclick="closeApplyModal()">&times;</button>
+                <div class="modal-header">Lamar Magang: <span id="applyInternshipTitle"></span></div>
+                <div class="modal-body">
+                    <div class="flex justify-around mb-8">
+                        <div id="step1Indicator" class="step-indicator active">1. Pilih CV</div>
+                        <div id="step2Indicator" class="step-indicator">2. Isi Formulir</div>
+                        <div id="step3Indicator" class="step-indicator">3. Konfirmasi</div>
+                    </div>
+
+                    <!-- Step 1: Pilih CV -->
+                    <div id="applyStep1" class="apply-step active">
+                        <h3 class="text-xl font-semibold mb-4">Pilih CV Anda</h3>
+                        <div class="border border-gray-300 rounded-lg p-6 text-center bg-gray-50">
+                            <p class="text-gray-600 mb-4">Pilih CV yang sudah ada atau unggah yang baru.</p>
+                            <div class="flex flex-col items-center space-y-4">
+                                <label for="uploadCvApply" class="btn-secondary cursor-pointer">
+                                    <i class="fas fa-upload mr-2"></i> Unggah CV Baru
+                                    <input type="file" id="uploadCvApply" class="hidden" accept=".pdf,.doc,.docx" onchange="displayFileName('uploadCvApply', 'uploadedCvName')">
+                                </label>
+                                <span id="uploadedCvName" class="text-gray-700 italic">Belum ada CV yang diunggah.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Isi Formulir -->
+                    <div id="applyStep2" class="apply-step">
+                        <h3 class="text-xl font-semibold mb-4">Lengkapi Formulir Lamaran</h3>
+                        <form id="applyForm">
+                            <div class="mb-4">
+                                <label for="applyFullName" class="block text-gray-700 text-sm font-bold mb-2">Nama Lengkap</label>
+                                <input type="text" id="applyFullName" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                            </div>
+                            <div class="mb-4">
+                                <label for="applyEmail" class="block text-gray-700 text-sm font-bold mb-2">Email</label>
+                                <input type="email" id="applyEmail" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                            </div>
+                            <div class="mb-4">
+                                <label for="applyPhone" class="block text-gray-700 text-sm font-bold mb-2">Nomor Telepon</label>
+                                <input type="tel" id="applyPhone" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                            </div>
+                            <div class="mb-4">
+                                <label for="applyCoverLetter" class="block text-gray-700 text-sm font-bold mb-2">Surat Lamaran (Opsional)</label>
+                                <textarea id="applyCoverLetter" rows="5" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"></textarea>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Step 3: Konfirmasi -->
+                    <div id="applyStep3" class="apply-step">
+                        <h3 class="text-xl font-semibold mb-4">Konfirmasi Lamaran Anda</h3>
+                        <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                            <p class="mb-2"><strong class="text-pink-strong">Posisi:</strong> <span id="confirmTitle"></span></p>
+                            <p class="mb-2"><strong class="text-pink-strong">Perusahaan:</strong> <span id="confirmCompany"></span></p>
+                            <p class="mb-2"><strong class="text-pink-strong">Nama:</strong> <span id="confirmFullName"></span></p>
+                            <p class="mb-2"><strong class="text-pink-strong">Email:</strong> <span id="confirmEmail"></span></p>
+                            <p class="mb-2"><strong class="text-pink-strong">Telepon:</strong> <span id="confirmPhone"></span></p>
+                            <p class="mb-2"><strong class="text-pink-strong">CV Terunggah:</strong> <span id="confirmCvName"></span></p>
+                            <p class="mb-2"><strong class="text-pink-strong">Surat Lamaran:</strong> <span id="confirmCoverLetter"></span></p>
+                            <p class="mt-4 text-gray-700 italic">Pastikan semua data yang Anda masukkan sudah benar sebelum mengirimkan lamaran.</p>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between mt-8">
+                        <button id="prevApplyStep" class="btn-secondary hidden" onclick="prevApplyStep()">Kembali</button>
+                        <button id="nextApplyStep" class="btn-primary ml-auto" onclick="nextApplyStep()">Selanjutnya</button>
+                        <button id="submitApplication" class="btn-primary hidden" onclick="submitApplication()">Kirim Lamaran</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Articles & Tips Page -->
+        <section id="articles" class="page">
+            <h1 class="text-4xl font-bold text-gray-900 mb-8 text-center">Artikel & Tips Karir</h1>
+
+            <div class="flex justify-center mb-8 space-x-4">
+                <button class="px-6 py-2 rounded-full border border-pink-strong text-pink-strong hover:bg-pink-soft transition duration-200 article-filter-btn active" data-category="all" onclick="filterArticles('all')">Semua</button>
+                <button class="px-6 py-2 rounded-full border border-pink-strong text-pink-strong hover:bg-pink-soft transition duration-200 article-filter-btn" data-category="cv" onclick="filterArticles('cv')">Tips CV</button>
+                <button class="px-6 py-2 rounded-full border border-pink-strong text-pink-strong hover:bg-pink-soft transition duration-200 article-filter-btn" data-category="interview" onclick="filterArticles('interview')">Wawancara</button>
+                <button class="px-6 py-2 rounded-full border border-pink-strong text-pink-strong hover:bg-pink-soft transition duration-200 article-filter-btn" data-category="networking" onclick="filterArticles('networking')">Networking</button>
+            </div>
+
+            <div id="articlesList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Articles will be loaded here by JS -->
+            </div>
+        </section>
+
+        <!-- Article Detail Modal -->
+        <div id="articleDetailModal" class="custom-modal-overlay">
+            <div class="custom-modal-content max-w-3xl w-full">
+                <button class="modal-close-btn" onclick="closeArticleDetailModal()">&times;</button>
+                <img id="articleDetailImage" src="" alt="Article Image" class="w-full h-48 object-cover rounded-lg mb-6">
+                <h2 id="articleDetailTitle" class="text-3xl font-bold text-gray-900 mb-3"></h2>
+                <p class="text-gray-600 text-sm mb-4">Oleh <span class="font-semibold" id="articleDetailAuthor"></span> | <span id="articleDetailDate"></span></p>
+                <div id="articleDetailContent" class="prose max-w-none text-gray-700 leading-relaxed overflow-y-auto max-h-96"></div>
+            </div>
+        </div>
+
+        <!-- Mentor Page -->
+        <section id="mentor" class="page">
+            <h1 class="text-4xl font-bold text-gray-900 mb-8 text-center">Temukan Mentormu</h1>
+
+            <div class="bg-pink-soft p-8 rounded-lg shadow-lg text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Dapatkan Bimbingan dari Ahlinya</h2>
+                <p class="text-lg text-gray-700 mb-6">Jelajahi profil mentor berpengalaman dan jadwalkan sesi bimbingan untuk mengembangkan karir Anda.</p>
+                <p class="text-md text-gray-600 mb-4 italic"> (Fitur ini memerlukan login untuk akses penuh)</p>
+            </div>
+
+            <div id="mentorList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Mentor cards will be loaded here by JS -->
+            </div>
+        </section>
+
+        <!-- Profile Page -->
+        <section id="profile" class="page">
+            <h1 class="text-4xl font-bold text-gray-900 mb-8 text-center">Profil Saya</h1>
+
+            <div class="bg-white p-8 rounded-lg shadow-md">
+                <div class="flex items-center space-x-6 mb-8">
+                    <img id="profileAvatar" src="https://placehold.co/120x120/DB2777/ffffff?text=User" alt="User Avatar" class="w-28 h-28 rounded-full object-cover border-4 border-pink-strong">
+                    <div>
+                        <h2 id="profileNameDisplay" class="text-3xl font-bold text-gray-900"></h2>
+                        <p id="profileJurusanDisplay" class="text-lg text-gray-600"></p>
+                    </div>
+                </div>
+
+                <!-- Tabs for Profile Sections -->
+                <div class="border-b border-gray-200 mb-6">
+                    <nav class="flex -mb-px" role="tablist">
+                        <button class="tab-button py-3 px-6 text-sm font-medium text-gray-600 border-b-2 border-transparent hover:border-pink-strong hover:text-pink-strong focus:outline-none active-tab"
+                                onclick="switchProfileTab('academic-biodata')" data-tab="academic-biodata" id="academicBiodataTab">Biodata Akademik</button>
+                        <button id="cvPortfolioTab" class="tab-button py-3 px-6 text-sm font-medium text-gray-600 border-b-2 border-transparent hover:border-pink-strong hover:text-pink-strong focus:outline-none"
+                                onclick="switchProfileTab('cv-portfolio')" data-tab="cv-portfolio">CV & Portofolio</button>
+                        <button class="tab-button py-3 px-6 text-sm font-medium text-gray-600 border-b-2 border-transparent hover:border-pink-strong hover:text-pink-strong focus:outline-none"
+                                onclick="switchProfileTab('application-history')" data-tab="application-history">Riwayat Lamaran</button>
+                        <button id="myJobPostingsTab" class="tab-button py-3 px-6 text-sm font-medium text-gray-600 border-b-2 border-transparent hover:border-pink-strong hover:text-pink-strong focus:outline-none hidden"
+                                onclick="switchProfileTab('my-job-postings')" data-tab="my-job-postings">Lowongan Saya</button>
+                        <button class="tab-button py-3 px-6 text-sm font-medium text-gray-600 border-b-2 border-transparent hover:border-pink-strong hover:text-pink-strong focus:outline-none"
+                                onclick="switchProfileTab('account-settings')" data-tab="account-settings">Pengaturan Akun</button>
+                    </nav>
+                </div>
+
+                <!-- Tab Content: Biodata Akademik -->
+                <div id="academic-biodata" class="profile-tab-content active-tab-content">
+                    <div id="biodataViewMode">
+                        <p class="mb-3 text-gray-700" id="viewBirthDateRow"><strong class="text-pink-strong" id="viewBirthDateLabel">Tanggal Lahir:</strong> <span id="viewBirthDate">-</span></p>
+                        <p class="mb-3 text-gray-700"><strong class="text-pink-strong">Alamat:</strong> <span id="viewAddress">-</span></p>
+                        <p class="mb-3 text-gray-700"><strong class="text-pink-strong">Nomor Telepon:</strong> <span id="viewPhone">-</span></p>
+                        <p class="mb-3 text-gray-700"><strong class="text-pink-strong">Email:</strong> <span id="viewEmail">-</span></p>
+                        <p class="mb-3 text-gray-700" id="viewEducationRow"><strong class="text-pink-strong">Pendidikan:</strong> <span id="viewEducation">-</span></p>
+                        <p class="mb-3 text-gray-700" id="viewOrganizationRow"><strong class="text-pink-strong">Pengalaman Organisasi:</strong> <span id="viewOrganization">-</span></p>
+                        <p class="mb-3 text-gray-700" id="viewSkillsRow"><strong class="text-pink-strong">Keterampilan:</strong> <span id="viewSkills">-</span></p>
+                        <button class="btn-primary mt-6" onclick="toggleBiodataEditMode(true)">Edit Profil</button>
+                    </div>
+
+                    <div id="biodataEditMode" class="hidden">
+                        <h3 class="text-2xl font-bold text-gray-900 mb-4">Edit Biodata</h3>
+                        <!-- Add file input for profile picture/logo -->
+                        <div class="mb-4 text-center">
+                            <label for="profileImageUpload" class="btn-secondary cursor-pointer inline-flex items-center">
+                                <i class="fas fa-camera mr-2"></i> <span id="imageUploadLabel">Unggah Foto Profil</span>
+                                <input type="file" id="profileImageUpload" class="hidden" accept="image/*" onchange="handleProfileImageUpload(event)">
+                            </label>
+                            <p class="text-sm text-gray-500 mt-2">Ukuran gambar maksimal 1MB.</p>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label for="editName" class="block text-gray-700 text-sm font-bold mb-2" id="editNameLabel">Nama Lengkap / Nama Perusahaan</label>
+                                <input type="text" id="editName" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                            </div>
+                            <div>
+                                <label for="editJurusan" class="block text-gray-700 text-sm font-bold mb-2" id="editJurusanLabel">Jurusan</label>
+                                <input type="text" id="editJurusan" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                            </div>
+                            <div id="editBirthDateContainer">
+                                <label for="editBirthDate" class="block text-gray-700 text-sm font-bold mb-2">Tanggal Lahir</label>
+                                <input type="date" id="editBirthDate" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                            </div>
+                            <div>
+                                <label for="editAddress" class="block text-gray-700 text-sm font-bold mb-2">Alamat</label>
+                                <input type="text" id="editAddress" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                            </div>
+                            <div>
+                                <label for="editPhone" class="block text-gray-700 text-sm font-bold mb-2">Nomor Telepon</label>
+                                <input type="tel" id="editPhone" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                            </div>
+                            <div>
+                                <label for="editEmail" class="block text-gray-700 text-sm font-bold mb-2">Email</label>
+                                <input type="email" id="editEmail" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                            </div>
+                        </div>
+                        <div class="mb-4" id="editEducationContainer">
+                            <label for="editEducation" class="block text-gray-700 text-sm font-bold mb-2">Pendidikan (Contoh: S1 Informatika - Universitas XYZ)</label>
+                            <textarea id="editEducation" rows="3" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"></textarea>
+                        </div>
+                        <div class="mb-4" id="editOrganizationContainer">
+                            <label for="editOrganization" class="block text-gray-700 text-sm font-bold mb-2">Pengalaman Organisasi</label>
+                            <textarea id="editOrganization" rows="3" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"></textarea>
+                        </div>
+                        <div class="mb-4" id="editSkillsContainer">
+                            <label for="editSkills" class="block text-gray-700 text-sm font-bold mb-2">Keterampilan (Pisahkan dengan koma)</label>
+                            <textarea id="editSkills" rows="3" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"></textarea>
+                        </div>
+                        <div class="flex space-x-4 mt-6">
+                            <button class="btn-primary" onclick="saveBiodata()">Simpan Perubahan</button>
+                            <button class="btn-secondary" onclick="toggleBiodataEditMode(false)">Batal</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab Content: CV & Portofolio -->
+                <div id="cv-portfolio" class="profile-tab-content hidden">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-4">CV Anda</h3>
+                    <div id="cvList" class="mb-6 space-y-3">
+                        <div class="bg-gray-50 p-4 rounded-lg flex justify-between items-center border border-gray-200">
+                            <span><i class="fas fa-file-pdf text-red-500 mr-2"></i> CV_AnnisaRahma_Terbaru.pdf</span>
+                            <button class="text-red-500 hover:text-red-700 text-lg" onclick="removeFile('cv', 'CV_AnnisaRahma_Terbaru.pdf')"><i class="fas fa-trash"></i></button>
+                        </div>
+                        <!-- More CVs can be added dynamically -->
+                    </div>
+                    <label for="uploadCvProfile" class="btn-secondary cursor-pointer">
+                        <i class="fas fa-upload mr-2"></i> Unggah CV Baru
+                        <input type="file" id="uploadCvProfile" class="hidden" accept=".pdf,.doc,.docx" onchange="addCvFile(event)">
+                    </label>
+
+                    <h3 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Portofolio Anda</h3>
+                    <div id="portfolioList" class="mb-6 space-y-3">
+                        <div class="bg-gray-50 p-4 rounded-lg flex justify-between items-center border border-gray-200">
+                            <span><i class="fas fa-image text-blue-500 mr-2"></i> Desain_UI_UX_InternLinkS.pdf</span>
+                            <button class="text-red-500 hover:text-red-700 text-lg" onclick="removeFile('portfolio', 'Desain_UI_UX_InternLinkS.pdf')"><i class="fas fa-trash"></i></button>
+                        </div>
+                        <!-- More portfolio items can be added dynamically -->
+                    </div>
+                    <label for="uploadPortfolioProfile" class="btn-secondary cursor-pointer">
+                        <i class="fas fa-plus-circle mr-2"></i> Tambah Proyek Baru
+                        <input type="file" id="uploadPortfolioProfile" class="hidden" accept=".pdf,.jpg,.jpeg,.png" onchange="addPortfolioFile(event)">
+                    </label>
+                </div>
+
+                <!-- Tab Content: Riwayat Lamaran -->
+                <div id="application-history" class="profile-tab-content hidden">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-4">Riwayat Lamaran Magang</h3>
+
+                    <div class="flex flex-wrap gap-4 mb-6 p-4 bg-gray-100 rounded-lg">
+                        <div class="flex-1 min-w-[150px]">
+                            <label for="appHistoryFilterJurusan" class="block text-gray-700 text-sm font-bold mb-1">Jurusan</label>
+                            <select id="appHistoryFilterJurusan" class="w-full p-2 border border-gray-300 rounded-md">
+                                <option value="">Semua</option>
+                                <option value="Informatika">Informatika</option>
+                                <option value="Desain Komunikasi Visual">Desain Komunikasi Visual</option>
+                                <option value="Manajemen Bisnis">Manajemen Bisnis</option>
+                                <option value="Ilmu Komunikasi">Ilmu Komunikasi</option>
+                                <option value="Akuntansi">Akuntansi</option>
+                            </select>
+                        </div>
+                        <div class="flex-1 min-w-[150px]">
+                            <label for="appHistoryFilterLokasi" class="block text-gray-700 text-sm font-bold mb-1">Lokasi</label>
+                            <select id="appHistoryFilterLokasi" class="w-full p-2 border border-gray-300 rounded-md">
+                                <option value="">Semua</option>
+                                <option value="Jakarta">Jakarta</option>
+                                <option value="Bandung">Bandung</option>
+                                <option value="Surabaya">Surabaya</option>
+                                <option value="Yogyakarta">Yogyakarta</option>
+                            </select>
+                        </div>
+                        <div class="flex-1 min-w-[150px]">
+                            <label for="appHistoryFilterType" class="block text-gray-700 text-sm font-bold mb-1">Jenis Magang</label>
+                            <select id="appHistoryFilterType" class="w-full p-2 border border-gray-300 rounded-md">
+                                <option value="">Semua</option>
+                                <option value="Berbayar">Berbayar</option>
+                                <option value="Tidak Berbayar">Tidak Berbayar</option>
+                            </select>
+                        </div>
+                        <div class="flex-1 min-w-[150px]">
+                            <label for="appHistoryFilterRemote" class="block text-gray-700 text-sm font-bold mb-1">Mode Kerja</label>
+                            <select id="appHistoryFilterRemote" class="w-full p-2 border border-gray-300 rounded-md">
+                                <option value="">Semua</option>
+                                <option value="On-Site">On-Site</option>
+                                <option value="Remote">Remote</option>
+                                <option value="Hybrid">Hybrid</option>
+                            </select>
+                        </div>
+                        <div class="flex items-end space-x-2">
+                            <button class="btn-primary px-4 py-2 text-sm" onclick="filterApplicationHistory()">Terapkan</button>
+                            <button class="btn-secondary px-4 py-2 text-sm" onclick="resetApplicationHistoryFilters()">Reset</button>
+                        </div>
+                    </div>
+
+                    <div id="applicationHistoryList" class="space-y-4">
+                        <!-- Applications will be added dynamically -->
+                    </div>
+                    <p id="noApplicationsMessage" class="text-center text-gray-500 mt-8 hidden">Belum ada riwayat lamaran.</p>
+                </div>
+
+                <!-- Tab Content: My Job Postings (for Companies) -->
+                <div id="my-job-postings" class="profile-tab-content hidden">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-4">Lowongan Magang Saya</h3>
+                    <div id="myJobPostingsList" class="space-y-4">
+                        <!-- Company's job postings will be loaded here -->
+                    </div>
+                    <p id="noMyPostingsMessage" class="text-center text-gray-500 mt-8 hidden">Anda belum memposting lowongan magang apa pun.</p>
+                    <button class="btn-primary mt-6" onclick="showPage('add-job-posting')">Tambah Lowongan Baru</button>
+                </div>
+
+
+                <!-- Tab Content: Pengaturan Akun -->
+                <div id="account-settings" class="profile-tab-content hidden">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-4">Pengaturan Akun</h3>
+                    <div class="mb-6">
+                        <label for="currentPassword" class="block text-gray-700 text-sm font-bold mb-2">Kata Sandi Saat Ini</label>
+                        <input type="password" id="currentPassword" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-6">
+                        <label for="newPassword" class="block text-gray-700 text-sm font-bold mb-2">Kata Sandi Baru</label>
+                        <input type="password" id="newPassword" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-6">
+                        <label for="confirmNewPassword" class="block text-gray-700 text-sm font-bold mb-2">Konfirmasi Kata Sandi Baru</label>
+                        <input type="password" id="confirmNewPassword" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <button class="btn-primary" onclick="showModal('Ganti Kata Sandi', 'Fitur ganti kata sandi sedang dalam pengembangan.')">Ubah Kata Sandi</button>
+
+                    <div class="mt-10 pt-6 border-t border-gray-200">
+                        <h3 class="text-2xl font-bold text-gray-900 mb-4">Dukungan</h3>
+                        <button class="btn-secondary" onclick="showAdminChatModal()">Hubungi Admin</button>
+                    </div>
+
+                    <div class="mt-10 pt-6 border-t border-gray-200">
+                        <button class="bg-red-500 text-white px-6 py-3 rounded-md hover:bg-red-700 transition duration-300" onclick="showModal('Hapus Akun', 'Apakah Anda yakin ingin menghapus akun Anda? Tindakan ini tidak dapat dibatalkan.', true, 'deleteAccount()')">Hapus Akun</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Login Page -->
+        <section id="login" class="page">
+            <div class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md mt-16">
+                <h2 class="text-3xl font-bold text-gray-900 mb-6 text-center">Login ke Akun Anda</h2>
+                <form id="loginForm" onsubmit="handleLogin(event)">
+                    <div class="mb-4">
+                        <label for="loginEmail" class="block text-gray-700 text-sm font-bold mb-2">Email</label>
+                        <input type="email" id="loginEmail" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                    </div>
+                    <div class="mb-6">
+                        <label for="loginPassword" class="block text-gray-700 text-sm font-bold mb-2">Kata Sandi</label>
+                        <input type="password" id="loginPassword" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                    </div>
+                    <button type="submit" class="btn-primary w-full mb-4">Login</button>
+                    <button type="button" class="btn-secondary w-full flex items-center justify-center space-x-2" onclick="showModal('Login Google', 'Fitur login dengan Google sedang dalam pengembangan.')">
+                        <img src="https://upload.wikimedia.wikimedia.org/wikipedia/commons/4/4a/Logo_2013_Google.png" alt="Google Logo" class="h-5">
+                        <span>Login dengan Google</span>
+                    </button>
+                    <p class="text-center text-gray-600 mt-6">Belum punya akun? <a href="#register" class="text-pink-strong hover:underline" onclick="showPage('register')">Daftar Sekarang</a></p>
+                </form>
+            </div>
+        </section>
+
+        <!-- Register Page -->
+        <section id="register" class="page">
+            <div class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md mt-16">
+                <h2 class="text-3xl font-bold text-gray-900 mb-6 text-center">Daftar Akun Baru</h2>
+                <form id="registerForm" onsubmit="handleRegister(event)">
+                    <div class="mb-4">
+                        <label for="registerType" class="block text-gray-700 text-sm font-bold mb-2">Daftar Sebagai</label>
+                        <select id="registerType" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" onchange="toggleCompanyFields()">
+                            <option value="intern">Pencari Magang</option>
+                            <option value="company">Perusahaan</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label for="registerName" class="block text-gray-700 text-sm font-bold mb-2" id="nameLabel">Nama Lengkap</label>
+                        <input type="text" id="registerName" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                    </div>
+                    <div class="mb-4 hidden" id="companyFields">
+                        <label for="registerIndustry" class="block text-gray-700 text-sm font-bold mb-2">Industri Perusahaan</label>
+                        <input type="text" id="registerIndustry" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4" id="internJurusanField">
+                        <label for="registerJurusan" class="block text-gray-700 text-sm font-bold mb-2">Jurusan</label>
+                        <input type="text" id="registerJurusan" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label for="registerEmail" class="block text-gray-700 text-sm font-bold mb-2">Email</label>
+                        <input type="email" id="registerEmail" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="registerPassword" class="block text-gray-700 text-sm font-bold mb-2">Kata Sandi</label>
+                        <input type="password" id="registerPassword" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                    </div>
+                    <div class="mb-6">
+                        <label for="registerConfirmPassword" class="block text-gray-700 text-sm font-bold mb-2">Konfirmasi Kata Sandi</label>
+                        <input type="password" id="registerConfirmPassword" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                    </div>
+                    <button type="submit" class="btn-primary w-full">Daftar</button>
+                    <p class="text-center text-gray-600 mt-6">Sudah punya akun? <a href="#login" class="text-pink-strong hover:underline" onclick="showPage('login')">Login Sekarang</a></p>
+                </form>
+            </div>
+        </section>
+
+        <!-- New Page: Add Job Posting -->
+        <section id="add-job-posting" class="page">
+            <h1 class="text-4xl font-bold text-gray-900 mb-8 text-center" id="addEditJobTitle">Posting Lowongan Magang Baru</h1>
+
+            <div class="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-md">
+                <form id="addJobForm" onsubmit="handleAddJobPosting(event)">
+                    <input type="hidden" id="jobIdToEdit"> <!-- Hidden field to store job ID for editing -->
+                    <div class="mb-4">
+                        <label for="jobTitle" class="block text-gray-700 text-sm font-bold mb-2">Judul Lowongan</label>
+                        <input type="text" id="jobTitle" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="jobCompany" class="block text-gray-700 text-sm font-bold mb-2">Nama Perusahaan</label>
+                        <input type="text" id="jobCompany" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required readonly> <!-- Pre-filled and readonly -->
+                    </div>
+                    <div class="mb-4">
+                        <label for="jobLocation" class="block text-gray-700 text-sm font-bold mb-2">Lokasi</label>
+                        <select id="jobLocation" class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-strong" required>
+                            <option value="">Pilih Lokasi</option>
+                            <option value="Jakarta">Jakarta</option>
+                            <option value="Bandung">Bandung</option>
+                            <option value="Surabaya">Surabaya</option>
+                            <option value="Yogyakarta">Yogyakarta</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label for="jobDuration" class="block text-gray-700 text-sm font-bold mb-2">Durasi Magang</label>
+                        <select id="jobDuration" class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-strong" required>
+                            <option value="">Pilih Durasi</option>
+                            <option value="3 Bulan">3 Bulan</option>
+                            <option value="6 Bulan">6 Bulan</option>
+                            <option value="12 Bulan">12 Bulan</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label for="jobSalary" class="block text-gray-700 text-sm font-bold mb-2">Gaji (per bulan)</label>
+                        <input type="text" id="jobSalary" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Contoh: Rp 3.000.000 - 5.000.000" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="jobRegistrationStart" class="block text-gray-700 text-sm font-bold mb-2">Jadwal Pendaftaran Mulai</label>
+                        <input type="date" id="jobRegistrationStart" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="jobRegistrationEnd" class="block text-gray-700 text-sm font-bold mb-2">Jadwal Pendaftaran Berakhir</label>
+                        <input type="date" id="jobRegistrationEnd" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="jobType" class="block text-gray-700 text-sm font-bold mb-2">Jenis Magang</label>
+                        <select id="jobType" class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-strong" required>
+                            <option value="">Pilih Jenis</option>
+                            <option value="Berbayar">Berbayar</option>
+                            <option value="Tidak Berbayar">Tidak Berbayar</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label for="jobRemote" class="block text-gray-700 text-sm font-bold mb-2">Mode Kerja</label>
+                        <select id="jobRemote" class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-strong" required>
+                            <option value="">Pilih Mode</option>
+                            <option value="On-Site">On-Site</option>
+                            <option value="Remote">Remote</option>
+                            <option value="Hybrid">Hybrid</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label for="jobJurusan" class="block text-gray-700 text-sm font-bold mb-2">Jurusan Terkait (untuk rekomendasi)</label>
+                        <select id="jobJurusan" class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-strong" required>
+                            <option value="">Pilih Jurusan</option>
+                            <option value="Informatika">Informatika</option>
+                            <option value="Desain Komunikasi Visual">Desain Komunikasi Visual</option>
+                            <option value="Manajemen Bisnis">Manajemen Bisnis</option>
+                            <option value="Ilmu Komunikasi">Ilmu Komunikasi</option>
+                            <option value="Akuntansi">Akuntansi</option>
+                            <option value="Umum">Umum (Untuk semua jurusan)</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label for="jobDescription" class="block text-gray-700 text-sm font-bold mb-2">Deskripsi Pekerjaan</label>
+                        <textarea id="jobDescription" rows="5" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required></textarea>
+                    </div>
+                    <div class="mb-4">
+                        <label for="jobQualifications" class="block text-gray-700 text-sm font-bold mb-2">Kualifikasi (Pisahkan setiap kualifikasi dengan baris baru)</label>
+                        <textarea id="jobQualifications" rows="5" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required></textarea>
+                    </div>
+                    <div class="mb-6">
+                        <label for="jobResponsibilities" class="block text-gray-700 text-sm font-bold mb-2">Tanggung Jawab (Pisahkan setiap tanggung jawab dengan baris baru)</label>
+                        <textarea id="jobResponsibilities" rows="5" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required></textarea>
+                    </div>
+                    <button type="submit" class="btn-primary w-full" id="submitJobButton">Posting Lowongan</button>
+                    <button type="button" class="btn-secondary w-full mt-4" onclick="showPage('my-job-postings')">Batal</button>
+                </form>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8 mt-16">
+        <div class="container mx-auto text-center px-4">
+            <div class="flex flex-col md:flex-row justify-center items-center md:space-x-8 mb-6">
+                <a href="#home" class="hover:text-pink-strong transition duration-200 mb-2 md:mb-0" onclick="showPage('home')">Beranda</a>
+                <a href="#find-internship" class="hover:text-pink-strong transition duration-200 mb-2 md:mb-0" onclick="showPage('find-internship')">Cari Magang</a>
+                <a href="#articles" class="hover:text-pink-strong transition duration-200 mb-2 md:mb-0" onclick="showPage('articles')">Artikel & Tips</a>
+                <a href="#mentor" class="hover:text-pink-strong transition duration-200 mb-2 md:mb-0" onclick="showPage('mentor')">Mentor</a>
+            </div>
+            <p class="text-gray-400">&copy; 2025 InternLink'S. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Global state variables (using var for broader accessibility in this environment)
+        var isLoggedIn = false;
+        var currentUserName = '';
+        var currentUserEmail = '';
+        var currentUserType = ''; // 'intern' or 'company'
+        var currentUserJurusan = ''; // Only for interns
+        var currentUserProfile = {}; // Store detailed profile data
+
+        // Simulated user database (stores accounts for the current session only)
+        // Default user for easy testing
+        var simulatedUserDatabase = [
+            { email: 'test@example.com', password: 'password123', name: 'Annisa Rahma', type: 'intern', jurusan: 'Informatika', profile: {
+                birthDate: '2000-01-01',
+                address: 'Jl. Contoh No. 123, Jakarta',
+                phone: '081234567890',
+                email: 'test@example.com',
+                education: 'S1 Informatika - Universitas Contoh',
+                organization: 'Divisi Humas BEM',
+                skills: 'JavaScript, HTML, CSS, Problem Solving',
+                cvs: ['CV_AnnisaRahma_Terbaru.pdf'],
+                portfolios: ['Desain_UI_UX_InternLinkS.pdf'],
+                applications: [
+                    { jobId: 2, jobTitle: 'Magang Social Media Specialist', company: 'Kreatif Digital Agency', date: '15 Mei 2025', status: 'Diajukan', applicantName: 'Annisa Rahma', applicantEmail: 'test@example.com' }
+                ],
+                isProfileCompleted: true, // Default user has completed profile
+                profileImageUrl: 'https://placehold.co/120x120/FBCFE8/DB2777?text=AR' // Default image for intern
+            } },
+            { email: 'company@example.com', password: 'password123', name: 'PT. Maju Bersama', type: 'company', industry: 'Teknologi', profile: {
+                isProfileCompleted: true, // Assume company profile is also completed
+                profileImageUrl: 'https://placehold.co/120x120/DB2777/ffffff?text=MB' // Default logo for company
+            }}
+        ];
+
+        // Simulated job data - IMPORTANT: Added salary, registrationStart, registrationEnd
+        var simulatedJobs = [
+            { id: 1, title: 'Magang Front-End Developer', company: 'Tech Innovate Solutions', location: 'Jakarta', duration: '6 Bulan', type: 'Berbayar', remote: 'On-Site', jurusan: 'Informatika', salary: 'Rp 4.000.000 - 6.000.000', registrationStart: '2025-06-01', registrationEnd: '2025-07-31', description: 'Bergabunglah dengan tim kami untuk mengembangkan antarmuka pengguna yang inovatif...', qualifications: ['Mahasiswa semester akhir jurusan Informatika/Ilmu Komputer', 'Menguasai HTML, CSS, JavaScript', 'Familiar dengan React/Vue'], responsibilities: ['Membangun UI interaktif', 'Mengembangkan komponen reusable', 'Berpartisipasi dalam code review'] },
+            { id: 2, title: 'Magang Social Media Specialist', company: 'Kreatif Digital Agency', location: 'Bandung', duration: '3 Bulan', type: 'Tidak Berbayar', remote: 'Remote', jurusan: 'Ilmu Komunikasi', salary: 'Tidak Berbayar', registrationStart: '2025-06-10', registrationEnd: '2025-07-20', description: 'Kelola media sosial dan buat strategi konten yang menarik...', qualifications: ['Mahasiswa jurusan Ilmu Komunikasi/Marketing', 'Kreatif dan aktif di media sosial', 'Memiliki kemampuan menulis yang baik'], responsibilities: ['Membuat jadwal konten', 'Mengelola akun media sosial', 'Melakukan analisis performa'] },
+            { id: 3, title: 'Magang Data Analyst', company: 'DataInsight Corp.', location: 'Surabaya', duration: '6 Bulan', type: 'Berbayar', remote: 'Hybrid', jurusan: 'Informatika', salary: 'Rp 3.500.000 - 5.500.000', registrationStart: '2025-07-01', registrationEnd: '2025-08-15', description: 'Bantu kami menganalisis data besar untuk mendapatkan wawasan bisnis...', qualifications: ['Mahasiswa jurusan Statistika/Informatika', 'Menguasai SQL dan Python/R', 'Memahami konsep dasar statistik'], responsibilities: ['Mengumpulkan dan membersihkan data', 'Membangun dashboard', 'Membuat laporan analisis'] },
+            { id: 4, title: 'Magang Desainer Grafis', company: 'Visual Arts Studio', location: 'Yogyakarta', duration: '3 Bulan', type: 'Tidak Berbayar', remote: 'On-Site', jurusan: 'Desain Komunikasi Visual', salary: 'Tidak Berbayar', registrationStart: '2025-05-20', registrationEnd: '2025-06-30', description: 'Kembangkan kreativitasmu dalam mendesain materi promosi dan branding...', qualifications: ['Mahasiswa jurusan DKV', 'Menguasai Adobe Photoshop, Illustrator', 'Memiliki portofolio desain'], responsibilities: ['Mendesain materi pemasaran', 'Membuat ilustrasi', 'Bekerja sama dengan tim marketing'] },
+            { id: 5, title: 'Magang Akuntan Junior', company: 'Accurate Finance Solutions', location: 'Jakarta', duration: '12 Bulan', type: 'Berbayar', remote: 'On-Site', jurusan: 'Akuntansi', salary: 'Rp 2.500.000 - 4.000.000', registrationStart: '2025-07-15', registrationEnd: '2025-09-01', description: 'Dapatkan pengalaman berharga dalam pembukuan dan laporan keuangan...', qualifications: ['Mahasiswa jurusan Akuntansi', 'Memahami dasar-dasar akuntansi', 'Teliti dan detail-oriented'], responsibilities: ['Membantu pembukuan harian', 'Menyiapkan laporan keuangan', 'Mendukung proses audit'] },
+            { id: 6, title: 'Magang UI/UX Designer', company: 'PixelPerfect Labs', location: 'Bandung', duration: '6 Bulan', type: 'Berbayar', remote: 'Remote', jurusan: 'Desain Komunikasi Visual', salary: 'Rp 3.000.000 - 5.000.000', registrationStart: '2025-06-25', registrationEnd: '2025-08-05', description: 'Rancang pengalaman pengguna yang intuitif dan menarik...', qualifications: ['Mahasiswa jurusan DKV/Sistem Informasi', 'Menguasai Figma/Sketch', 'Memahami prinsip UI/UX'], responsibilities: ['Melakukan riset pengguna', 'Membuat wireframe dan prototype', 'Berkoordinasi dengan developer'] },
+            { id: 7, title: 'Magang Business Development', company: 'Growth Ventures', location: 'Jakarta', duration: '6 Bulan', type: 'Berbayar', remote: 'Hybrid', jurusan: 'Manajemen Bisnis', salary: 'Rp 4.500.000 - 7.000.000', registrationStart: '2025-07-05', registrationEnd: '2025-08-20', description: 'Bantu kami mengidentifikasi peluang bisnis baru dan mengembangkan kemitraan strategis...', qualifications: ['Mahasiswa jurusan Manajemen/Ekonomi', 'Memiliki kemampuan komunikasi yang baik', 'Proaktif dan berorientasi pada target'], responsibilities: ['Melakukan riset pasar', 'Mencari calon klien', 'Mempersiapkan presentasi bisnis'] },
+            { id: 8, title: 'Magang Content Writer', company: 'Wordsmith Creative', location: 'Surabaya', duration: '3 Bulan', type: 'Tidak Berbayar', remote: 'Remote', jurusan: 'Ilmu Komunikasi', salary: 'Tidak Berbayar', registrationStart: '2025-06-15', registrationEnd: '2025-07-25', description: 'Buat konten yang menarik dan informatif untuk berbagai platform...', qualifications: ['Mahasiswa jurusan Ilmu Komunikasi/Sastra', 'Kemampuan menulis kreatif dan editorial', 'Memahami SEO dasar'], responsibilities: ['Menulis artikel blog', 'Membuat copy untuk media sosial', 'Melakukan riset topik'] },
+            { id: 9, title: 'Magang IT Support', company: 'SecureNet Solutions', location: 'Yogyakarta', duration: '6 Bulan', type: 'Berbayar', remote: 'On-Site', jurusan: 'Informatika', salary: 'Rp 3.000.000 - 5.000.000', registrationStart: '2025-07-20', registrationEnd: '2025-09-05', description: 'Berikan dukungan teknis kepada pengguna internal dan eksternal...', qualifications: ['Mahasiswa jurusan Informatika/Sistem Informasi', 'Memahami dasar-dasar jaringan dan hardware', 'Problem-solving yang baik'], responsibilities: ['Merespon permintaan dukungan', 'Mendiagnosis masalah teknis', 'Melakukan pemeliharaan sistem'] },
+            { id: 10, title: 'Magang PR Specialist', company: 'Image Builders PR', location: 'Jakarta', duration: '3 Bulan', type: 'Berbayar', remote: 'On-Site', jurusan: 'Ilmu Komunikasi', salary: 'Rp 2.800.000 - 4.500.000', registrationStart: '2025-06-05', registrationEnd: '2025-07-10', description: 'Bantu membangun citra positif perusahaan dan mengelola hubungan media...', qualifications: ['Mahasiswa jurusan Ilmu Komunikasi/Hubungan Masyarakat', 'Kemampuan komunikasi verbal dan tulisan yang sangat baik', 'Jaringan media yang luas (opsional)'], responsibilities: ['Mempersiapkan rilis pers', 'Mengelola hubungan dengan media', 'Membantu event PR'] },
+            { id: 11, title: 'Magang Research & Development', company: 'FutureTech Innovations', location: 'Bandung', duration: '12 Bulan', type: 'Berbayar', remote: 'Hybrid', jurusan: 'Informatika', salary: 'Rp 5.000.000 - 8.000.000', registrationStart: '2025-07-10', registrationEnd: '2025-09-20', description: 'Berpartisipasi dalam proyek penelitian dan pengembangan teknologi baru...', qualifications: ['Mahasiswa semester akhir jurusan Informatika/Teknik Elektro', 'Memiliki dasar pemrograman yang kuat', 'Tertarik pada inovasi dan eksperimen'], responsibilities: ['Melakukan riset teknologi', 'Mengembangkan prototipe', 'Menulis laporan teknis'] },
+            { id: 12, title: 'Magang Event Organizer', company: 'Dynamic Events Co.', location: 'Surabaya', duration: '3 Bulan', type: 'Tidak Berbayar', remote: 'On-Site', jurusan: 'Manajemen Bisnis', salary: 'Tidak Berbayar', registrationStart: '2025-06-20', registrationEnd: '2025-07-30', description: 'Dapatkan pengalaman langsung dalam perencanaan dan pelaksanaan acara...', qualifications: ['Mahasiswa jurusan Manajemen/Pariwisata', 'Kreatif dan detail-oriented', 'Mampu bekerja di bawah tekanan'], responsibilities: ['Membantu perencanaan acara', 'Koordinasi vendor', 'Pelaksanaan event di lapangan'] },
+        ];
+
+        var currentFilteredJobs = [];
+        var currentPage = 1;
+        var jobsPerPage = 6;
+
+        var simulatedArticles = [
+            { id: 1, category: 'cv', title: '5 Tips Jitu Membuat CV Anti-Tolak', author: 'Tim InternLink\'S', date: '10 Juni 2025', image: 'https://placehold.co/600x300/FBCFE8/DB2777?text=Tips+CV', content: `
+                <p>Membuat CV yang menarik adalah langkah pertama untuk mendapatkan magang impian. Berikut 5 tips jitu yang bisa Anda terapkan:</p>
+                <ol class="list-decimal list-inside space-y-2 mt-4">
+                    <li><strong>Singkat & Padat:</strong> Idealnya 1-2 halaman saja. Rekruter hanya punya waktu singkat untuk membaca.</li>
+                    <li><strong>Highlight Prestasi:</strong> Daripada hanya menuliskan tugas, fokus pada pencapaian dan hasil yang Anda raih (gunakan angka jika bisa).</li>
+                    <li><strong>Sesuaikan dengan Posisi:</strong> Ubah CV Anda sedikit agar relevan dengan deskripsi pekerjaan yang dilamar. Gunakan kata kunci dari lowongan tersebut.</li>
+                    <li><strong>Desain Bersih & Profesional:</strong> Gunakan layout yang mudah dibaca, font yang profesional, dan pastikan tidak ada typo.</li>
+                    <li><strong>Minta Review:</strong> Minta teman, mentor, atau pusat karir universitas untuk mereview CV Anda sebelum dikirim.</li>
+                </ol>
+                <p class="mt-4">Dengan menerapkan tips ini, CV Anda akan lebih menonjol dan menarik perhatian rekruter!</p>
+            `},
+            { id: 2, category: 'interview', title: 'Rahasia Sukses Wawancara Magang Pertama', author: 'Budi Santoso', date: '5 Juni 2025', image: 'https://placehold.co/600x300/FBCFE8/DB2777?text=Tips+Wawancara', content: `
+                <p>Wawancara magang pertama bisa jadi mendebarkan, tapi dengan persiapan matang, Anda bisa sukses! Berikut beberapa rahasianya:</p>
+                <ul class="list-disc list-inside space-y-2 mt-4">
+                    <li><strong>Riset Perusahaan:</strong> Pahami visi, misi, produk, dan budaya perusahaan.</li>
+                    <li><strong>Pahami Posisi:</strong> Ketahui tanggung jawab dan kualifikasi yang dibutuhkan.</li>
+                    <li><strong>Siapkan Jawaban Umum:</strong> Latih jawaban untuk pertanyaan seperti "Ceritakan tentang diri Anda", "Kelebihan dan kekurangan Anda", "Mengapa Anda tertarik magang di sini?".</li>
+                    <li><strong>Siapkan Pertanyaan:</strong> Ajukan pertanyaan yang menunjukkan minat Anda pada perusahaan dan posisi tersebut.</li>
+                    <li><strong>Penampilan Profesional:</strong> Berpakaian rapi dan sesuai.</li>
+                    <li><strong>Sikap Positif:</strong> Tunjukkan antusiasme, rasa ingin tahu, dan kemampuan belajar.</li>
+                </ul>
+                <p class="mt-4">Ingat, wawancara adalah kesempatan Anda untuk menunjukkan siapa diri Anda sebenarnya. Percaya diri dan tunjukkan potensi terbaik Anda!</p>
+            `},
+            { id: 3, category: 'networking', title: 'Bangun Jaringan Karir Sejak Dini', author: 'Citra Dewi', date: '1 Juni 2025', image: 'https://placehold.co/600x300/FBCFE8/DB2777?text=Tips+Networking', content: `
+                <p>Jaringan (networking) adalah kunci sukses dalam karir. Mulailah membangunnya sejak Anda mahasiswa:</p>
+                <ul class="list-disc list-inside space-y-2 mt-4">
+                    <li><strong>Ikuti Acara Karir:</strong> Hadiri job fair, seminar, dan workshop yang diselenggarakan universitas atau pihak eksternal.</li>
+                    <li><strong>Manfaatkan LinkedIn:</strong> Buat profil profesional, koneksi dengan profesional di bidang Anda, dan ikuti perusahaan yang diminati.</li>
+                    <li><strong>Aktif di Organisasi Kampus:</strong> Berinteraksi dengan dosen, alumni, dan teman sebaya yang memiliki minat serupa.</li>
+                    <li><strong>Mentor:</strong> Cari mentor yang bisa membimbing dan mengenalkan Anda pada komunitas profesional.</li>
+                    <li><strong>Jangan Ragu Menyapa:</strong> Ketika bertemu profesional, perkenalkan diri Anda dan tanyakan pertanyaan yang relevan.</li>
+                </ul>
+                <p class="mt-4">Setiap koneksi adalah investasi untuk masa depan karir Anda. Jangan takut untuk memulai dan tetaplah menjaga hubungan baik!</p>
+            `},
+            { id: 4, category: 'interview', title: 'Pertanyaan Jebakan Wawancara & Cara Menjawabnya', author: 'Tim InternLink\'S', date: '28 Mei 2025', image: 'https://placehold.co/600x300/FBCFE8/DB2777?text=Jebakan+Wawancara', content: `
+                <p>Beberapa pertanyaan wawancara seringkali menjadi jebakan. Berikut adalah beberapa contoh dan cara terbaik untuk menjawabnya:</p>
+                <ul class="list-disc list-inside space-y-2 mt-4">
+                    <li><strong>"Apa kelemahan terbesar Anda?":</strong> Jujurlah namun fokus pada bagaimana Anda bekerja untuk mengatasinya. Contoh: "Saya cenderung terlalu kritis terhadap pekerjaan saya, namun saya belajar untuk menetapkan batasan waktu dan meminta umpan balik lebih awal."</li>
+                    <li><strong>"Mengapa Anda ingin bekerja di sini?":</strong> Tunjukkan bahwa Anda telah melakukan riset. Hubungkan visi dan misi perusahaan dengan nilai-nilai atau tujuan karir Anda.</li>
+                    <li><strong>"Di mana Anda melihat diri Anda dalam 5 tahun?":</strong> Berikan jawaban yang realistis dan menunjukkan ambisi untuk tumbuh dalam karir Anda, idealnya di perusahaan tersebut.</li>
+                    <li><strong>"Ceritakan tentang pengalaman Anda gagal/membuat kesalahan.":</strong> Akui kesalahan, jelaskan apa yang Anda pelajari darinya, dan bagaimana Anda mengaplikasikan pelajaran tersebut.</li>
+                </ul>
+                <p class="mt-4">Kunci menghadapi pertanyaan jebakan adalah tetap tenang, jujur, dan selalu kaitkan jawaban dengan potensi positif dan pembelajaran Anda.</p>
+            `},
+            { id: 5, category: 'cv', title: 'Mendesain CV yang Menarik Perhatian Rekruter', author: 'Desainer Hebat', date: '20 Mei 2025', image: 'https://placehold.co/600x300/FBCFE8/DB2777?text=Desain+CV', content: `
+                <p>Desain CV yang baik tidak hanya enak dipandang, tetapi juga membantu rekruter menemukan informasi penting dengan cepat. Berikut tipsnya:</p>
+                <ul class="list-disc list-inside space-y-2 mt-4">
+                    <li><strong>Pilih Template Bersih:</strong> Hindari terlalu banyak warna atau font yang rumit. Simplicity is key.</li>
+                    <li><strong>Gunakan Ruang Kosong:</strong> Jangan menjejalkan terlalu banyak teks. Ruang kosong (whitespace) membuat CV lebih mudah dibaca.</li>
+                    <li><strong>Hierarki Visual:</strong> Gunakan ukuran font, bold, dan warna (secukupnya) untuk menyoroti bagian penting seperti nama, posisi, dan pencapaian.</li>
+                    <li><strong>Konsisten:</strong> Pastikan konsistensi dalam penggunaan font, warna, dan format di seluruh CV Anda.</li>
+                    <li><strong>PDF adalah Raja:</strong> Selalu kirimkan CV Anda dalam format PDF agar tampilannya tidak berubah di perangkat mana pun.</li>
+                </ul>
+                <p class="mt-4">Ingat, CV adalah representasi visual dari diri Anda. Pastikan itu mencerminkan profesionalisme dan perhatian terhadap detail.</p>
+            `}
+        ];
+
+        var currentActiveApplyJob = null; // To store the job being applied for
+        var editingJobId = null; // To store the ID of the job being edited
+
+        // Simulated Mentor Data
+        var simulatedMentors = [
+            { id: 1, name: 'Dr. Aria Wijaya', expertise: 'Ahli AI & Machine Learning', major: 'Informatika', description: 'Pengalaman 10+ tahun di industri teknologi, siap membimbingmu dalam karir AI dan Machine Learning.', image: 'https://placehold.co/120x120/FBCFE8/DB2777?text=Aria' },
+            { id: 2, name: 'Bu Retno Sari', expertise: 'Spesialis Marketing Digital', major: 'Manajemen Bisnis', description: 'Founder agensi digital terkemuka, mentor terbaik untuk strategi pemasaran dan branding digital.', image: 'https://placehold.co/120x120/FBCFE8/DB2777?text=Retno' },
+            { id: 3, name: 'Pak Cahyo Utomo', expertise: 'Konsultan Karir & HR', major: 'Umum', description: 'Pengalaman 15 tahun di bidang HR. Bantu optimalkan CV dan persiapan wawancara Anda.', image: 'https://placehold.co/120x120/FBCFE8/DB2777?text=Cahyo' },
+            { id: 4, name: 'Lena Permata', expertise: 'UX/UI Design Lead', major: 'Desain Komunikasi Visual', description: 'Berpengalaman membangun produk digital yang intuitif dan estetik. Siap berbagi ilmu UI/UX.', image: 'https://placehold.co/120x120/FBCFE8/DB2777?text=Lena' },
+            { id: 5, name: 'Faisal Ramadhan', expertise: 'Product Manager', major: 'Informatika', description: 'Membantu startup mengembangkan produk yang sukses. Bimbingan karir di bidang manajemen produk.', image: 'https://placehold.co/120x120/FBCFE8/DB2777?text=Faisal' },
+            { id: 6, name: 'Dewi Lestari', expertise: 'Penulis Konten Kreatif', major: 'Ilmu Komunikasi', description: 'Ahli dalam membuat konten yang menarik dan strategi komunikasi. Cocok untuk calon penulis atau PR.', image: 'https://placehold.co/120x120/FBCFE8/DB2777?text=Dewi' }
+        ];
+
+        // Simulated applicants data for specific jobs (simplified for prototype)
+        // In a real app, this would be retrieved from a database linked to job applications
+        var simulatedJobApplicants = {
+            1: [ // Applicants for job ID 1 (Magang Front-End Developer)
+                { name: 'Andi Pratama', email: 'andi@example.com', jurusan: 'Informatika', cv: 'Andi_CV.pdf' },
+                { name: 'Siti Aminah', email: 'siti@example.com', jurusan: 'Sistem Informasi', cv: 'Siti_CV.pdf' }
+            ],
+            2: [ // Applicants for job ID 2 (Magang Social Media Specialist)
+                { name: 'Bunga Citra', email: 'bunga@example.com', jurusan: 'Ilmu Komunikasi', cv: 'Bunga_CV.pdf' }
+            ],
+            // ... more job IDs and their simulated applicants
+        };
+
+
+        // --- Core UI Functions ---
+
+        function showPage(pageId, registerTypeParam) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            // Show the requested page
+            var targetPage = document.getElementById(pageId);
+            if (targetPage) { // Defensive check
+                targetPage.classList.add('active');
+            }
+
+            // Update URL hash
+            window.location.hash = pageId;
+
+            // Specific logic for certain pages
+            if (pageId === 'find-internship') {
+                applyFilters(); // Apply filters to ensure initial display or after a search from home
+            } else if (pageId === 'home') {
+                loadHomeInternships();
+            } else if (pageId === 'articles') {
+                filterArticles('all'); // Show all articles by default
+            } else if (pageId === 'mentor') {
+                if (!isLoggedIn) {
+                    showModal('Akses Ditolak!', 'Anda harus login untuk melihat halaman mentor.', false, null, () => showPage('login'));
+                    return; // Stop execution if not logged in
+                }
+                displayMentors(); // Load mentor data
+            } else if (pageId === 'profile') {
+                if (!isLoggedIn) {
+                    showModal('Akses Ditolak!', 'Anda harus login untuk melihat halaman profil.', false, null, () => showPage('login'));
+                    return; // Stop execution if not logged in
+                }
+                loadProfileData(); // Load profile data first
+                
+                // --- Conditional Tab Visibility Logic for Profile ---
+                var myJobPostingsTab = document.getElementById('myJobPostingsTab');
+                var cvPortfolioTab = document.getElementById('cvPortfolioTab');
+                var academicBiodataTab = document.getElementById('academicBiodataTab');
+                var applicationHistoryTab = document.querySelector('[data-tab="application-history"]');
+
+
+                if (currentUserType === 'company') {
+                    if(academicBiodataTab) academicBiodataTab.innerText = 'Biodata Perusahaan'; 
+                    if(myJobPostingsTab) myJobPostingsTab.classList.remove('hidden');
+                    if(cvPortfolioTab) cvPortfolioTab.classList.add('hidden'); // Hide CV/Portfolio for companies
+                    if(applicationHistoryTab) applicationHistoryTab.classList.add('hidden'); // Hide Application History for companies
+                    switchProfileTab('my-job-postings'); // Default to my job postings for companies
+                } else { // intern 
+                    if(academicBiodataTab) academicBiodataTab.innerText = 'Biodata Akademik'; 
+                    if(myJobPostingsTab) myJobPostingsTab.classList.add('hidden');
+                    if(cvPortfolioTab) cvPortfolioTab.classList.remove('hidden'); // Show CV/Portfolio for interns
+                    if(applicationHistoryTab) applicationHistoryTab.classList.remove('hidden'); // Show Application History for interns
+
+                    var currentUser = simulatedUserDatabase.find(u => u.email === currentUserEmail);
+                    if (currentUser && !currentUser.profile.isProfileCompleted) { 
+                        switchProfileTab('academic-biodata');
+                        toggleBiodataEditMode(true); // Open edit mode for first time users
+                        currentUser.profile.isProfileCompleted = true; // Mark as completed for this session
+                    } else {
+                        switchProfileTab('academic-biodata'); // Default tab for interns
+                    }
+                }
+            } else if (pageId === 'add-job-posting') {
+                if (!isLoggedIn || currentUserType !== 'company') {
+                    showModal('Akses Ditolak!', 'Anda harus login sebagai perusahaan untuk memposting lowongan magang.', false, null, () => showPage('login'));
+                    return;
+                }
+                // Reset form for new posting, pre-fill company name
+                document.getElementById('addEditJobTitle').innerText = 'Posting Lowongan Magang Baru';
+                document.getElementById('jobIdToEdit').value = '';
+                document.getElementById('addJobForm').reset();
+                document.getElementById('jobCompany').value = currentUserName;
+                document.getElementById('submitJobButton').innerText = 'Posting Lowongan';
+            }
+            else if (pageId === 'register' && registerTypeParam) {
+                document.getElementById('registerType').value = registerTypeParam;
+                toggleCompanyFields();
+            }
+
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+
+        function showModal(header, body, isConfirm, confirmAction, onOkeCallback) {
+            var modalHeader = document.getElementById('modalHeader');
+            var modalBody = document.getElementById('modalBody');
+            var modalFooter = document.getElementById('modalFooter');
+            var customModal = document.getElementById('customModal');
+
+            if (modalHeader) modalHeader.innerText = header;
+            if (modalBody) modalBody.innerText = body;
+            if (modalFooter) modalFooter.innerHTML = ''; // Clear previous buttons
+
+            if (isConfirm) {
+                if (modalFooter) {
+                    modalFooter.innerHTML = `
+                        <button class="btn-secondary mr-2" onclick="closeModal()">Batal</button>
+                        <button class="modal-button" onclick="closeModal(); ${confirmAction}">Ya</button>
+                    `;
+                }
+            } else {
+                var okeButton = document.createElement('button');
+                okeButton.className = 'modal-button';
+                okeButton.innerText = 'Oke';
+                okeButton.onclick = () => {
+                    closeModal();
+                    if (onOkeCallback) onOkeCallback();
+                };
+                if (modalFooter) modalFooter.appendChild(okeButton);
+            }
+
+            if (customModal) customModal.classList.add('active');
+        }
+
+        function closeModal() {
+            var customModal = document.getElementById('customModal');
+            if (customModal) customModal.classList.remove('active');
+        }
+
+        function updateAuthUI() {
+            var authButtons = document.getElementById('authButtons');
+            var loggedInUserDiv = document.getElementById('loggedInUser');
+            var loggedInUserNameSpan = document.getElementById('loggedInUserName');
+            var profileNav = document.getElementById('profileNav');
+            var findInternshipNav = document.getElementById('findInternshipNav'); // Get "Cari Magang" nav item
+
+            if (isLoggedIn) {
+                if(authButtons) authButtons.classList.add('hidden');
+                if(loggedInUserDiv) {
+                    loggedInUserDiv.classList.remove('hidden');
+                    loggedInUserDiv.classList.add('flex');
+                }
+                if(loggedInUserNameSpan) loggedInUserNameSpan.innerText = currentUserName;
+                if(profileNav) profileNav.classList.remove('hidden'); // Profile nav always visible
+
+                // Conditional visibility for "Cari Magang"
+                if (findInternshipNav) {
+                    if (currentUserType === 'company') {
+                        findInternshipNav.classList.add('hidden');
+                    } else {
+                        findInternshipNav.classList.remove('hidden');
+                    }
+                }
+            } else {
+                if(authButtons) authButtons.classList.remove('hidden');
+                if(loggedInUserDiv) {
+                    loggedInUserDiv.classList.add('hidden');
+                    loggedInUserDiv.classList.remove('flex');
+                }
+                if(loggedInUserNameSpan) loggedInUserNameSpan.innerText = '';
+                if(profileNav) profileNav.classList.add('hidden');
+                if(findInternshipNav) findInternshipNav.classList.remove('hidden'); // Always visible when logged out
+            }
+            loadHomeInternships(); // Reload home internships to show recommendations if logged in
+        }
+
+        // --- Authentication Functions ---
+
+        function handleLogin(event) {
+            event.preventDefault();
+            var email = document.getElementById('loginEmail').value;
+            var password = document.getElementById('loginPassword').value;
+
+            var user = simulatedUserDatabase.find(u => u.email === email && u.password === password);
+
+            if (user) {
+                isLoggedIn = true;
+                currentUserName = user.name;
+                currentUserEmail = user.email;
+                currentUserType = user.type;
+                currentUserJurusan = user.jurusan || '';
+                currentUserProfile = user.profile || {}; // Load user's profile data
+                updateAuthUI();
+                // Check if profile completion is needed
+                if (!currentUserProfile.isProfileCompleted && currentUserType === 'intern') {
+                    showModal('Login Berhasil!', `Selamat datang, ${currentUserName}! Harap lengkapi profil Anda.`, false, null, () => showPage('profile'));
+                } else {
+                    showModal('Login Berhasil!', `Selamat datang, ${currentUserName}!`, false, null, () => showPage('home'));
+                }
+            } else {
+                showModal('Login Gagal', 'Email atau kata sandi salah. Silakan coba lagi.');
+            }
+        }
+
+        function handleRegister(event) {
+            event.preventDefault();
+            var type = document.getElementById('registerType').value;
+            var name = document.getElementById('registerName').value;
+            var email = document.getElementById('registerEmail').value;
+            var password = document.getElementById('registerPassword').value;
+            var confirmPassword = document.getElementById('registerConfirmPassword').value;
+            var jurusan = document.getElementById('registerJurusan').value;
+            var industry = document.getElementById('registerIndustry').value;
+
+            if (password !== confirmPassword) {
+                showModal('Pendaftaran Gagal', 'Konfirmasi kata sandi tidak cocok.');
+                return;
+            }
+
+            if (simulatedUserDatabase.some(u => u.email === email)) {
+                showModal('Pendaftaran Gagal', 'Email ini sudah terdaftar.');
+                return;
+            }
+
+            var newUser = {
+                email,
+                password,
+                name,
+                type,
+                jurusan: type === 'intern' ? jurusan : undefined,
+                industry: type === 'company' ? industry : undefined,
+                profile: { // Initialize default profile data
+                    birthDate: '-',
+                    address: '-',
+                    phone: '-',
+                    email: email, // Default email from registration
+                    education: '-',
+                    organization: '-',
+                    skills: '-',
+                    cvs: [],
+                    portfolios: [],
+                    applications: [],
+                    isProfileCompleted: false, // Flag to check if basic profile is filled
+                    profileImageUrl: '' // Initialize with empty string for new users
+                }
+            };
+            simulatedUserDatabase.push(newUser);
+
+            // Auto-login after successful registration
+            isLoggedIn = true;
+            currentUserName = newUser.name;
+            currentUserEmail = newUser.email;
+            currentUserType = newUser.type;
+            currentUserJurusan = newUser.jurusan || '';
+            currentUserProfile = newUser.profile;
+            updateAuthUI();
+
+            showModal('Pendaftaran Berhasil!', `Akun Anda berhasil dibuat, ${currentUserName}!`, false, null, () => showPage('profile')); // Redirect to profile after register
+        }
+
+        function toggleCompanyFields() {
+            var registerType = document.getElementById('registerType').value;
+            var companyFields = document.getElementById('companyFields');
+            var internJurusanField = document.getElementById('internJurusanField');
+            var nameLabel = document.getElementById('nameLabel');
+
+            if (registerType === 'company') {
+                if(companyFields) companyFields.classList.remove('hidden');
+                if(internJurusanField) internJurusanField.classList.add('hidden');
+                if(document.getElementById('registerJurusan')) document.getElementById('registerJurusan').value = ''; // Clear jurusan
+                if(document.getElementById('registerIndustry')) document.getElementById('registerIndustry').required = true;
+                if(document.getElementById('registerJurusan')) document.getElementById('registerJurusan').required = false;
+                if(nameLabel) nameLabel.innerText = 'Nama Perusahaan';
+            } else {
+                if(companyFields) companyFields.classList.add('hidden');
+                if(internJurusanField) internJurusanField.classList.remove('hidden');
+                if(document.getElementById('registerIndustry')) document.getElementById('registerIndustry').value = ''; // Clear industry
+                if(document.getElementById('registerJurusan')) document.getElementById('registerJurusan').required = true;
+                if(document.getElementById('registerIndustry')) document.getElementById('registerIndustry').required = false;
+                if(nameLabel) nameLabel.innerText = 'Nama Lengkap';
+            }
+        }
+
+        function logout() {
+            isLoggedIn = false;
+            currentUserName = '';
+            currentUserEmail = '';
+            currentUserType = '';
+            currentUserJurusan = '';
+            currentUserProfile = {}; // Clear profile data
+            updateAuthUI();
+            showModal('Logout Berhasil!', 'Anda telah berhasil logout.', false, null, () => showPage('home'));
+        }
+
+        // --- Internship Listing & Detail Functions ---
+
+        function loadHomeInternships() {
+            var homeInternshipList = document.getElementById('homeInternshipList');
+            var homeInternshipSectionTitle = document.getElementById('homeInternshipSectionTitle');
+            if(homeInternshipList) homeInternshipList.innerHTML = ''; // Clear previous listings
+
+            var internshipsToShow = [];
+            // Show recommendations only if logged in as an intern and jurusan is available
+            if (isLoggedIn && currentUserType === 'intern' && currentUserJurusan && currentUserJurusan !== '-') {
+                if(homeInternshipSectionTitle) homeInternshipSectionTitle.innerText = `Rekomendasi untuk Anda (${currentUserJurusan})`;
+                internshipsToShow = simulatedJobs.filter(job => job.jurusan.toLowerCase().includes(currentUserJurusan.toLowerCase()));
+                // If no specific jurusan matches, show general latest
+                if (internshipsToShow.length === 0) {
+                    internshipsToShow = simulatedJobs.slice(0, 6); // Show first 6 if no recommendations
+                    if(homeInternshipSectionTitle) homeInternshipSectionTitle.innerText = 'Lowongan Magang Terbaru';
+                }
+            } else {
+                if(homeInternshipSectionTitle) homeInternshipSectionTitle.innerText = 'Lowongan Magang Terbaru';
+                internshipsToShow = simulatedJobs.slice(0, 6); // Show first 6 by default
+            }
+
+
+            internshipsToShow.forEach(job => {
+                var card = `
+                    <div class="bg-white p-6 rounded-lg shadow-md transform hover:scale-105 transition duration-300 cursor-pointer" onclick="showInternshipDetail(${job.id})">
+                        <div class="flex items-center mb-4">
+                            <img src="https://placehold.co/60x60/DB2777/ffffff?text=${job.company.charAt(0)}" alt="${job.company} Logo" class="w-16 h-16 rounded-md mr-4">
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-900">${job.title}</h3>
+                                <p class="text-gray-600">${job.company}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center text-gray-500 text-sm mb-3">
+                            <i class="fas fa-map-marker-alt mr-2"></i> ${job.location}
+                            <span class="mx-2">•</span>
+                            <i class="fas fa-clock mr-2"></i> ${job.duration}
+                            <span class="mx-2">•</span>
+                            <i class="fas fa-wallet mr-2"></i> ${job.type}
+                            <span class="mx-2">•</span>
+                            <i class="fas fa-money-bill-wave mr-2"></i> ${job.salary}
+                            <span class="mx-2">•</span>
+                            <i class="fas fa-desktop mr-2"></i> ${job.remote}
+                        </div>
+                        <p class="text-gray-700 text-sm line-clamp-3">${job.description}</p>
+                    </div>
+                `;
+                if(homeInternshipList) homeInternshipList.innerHTML += card;
+            });
+        }
+
+
+        function displayInternships() {
+            var internshipListDiv = document.getElementById('internshipList');
+            var internshipCountSpan = document.getElementById('internshipCount');
+            if(internshipListDiv) internshipListDiv.innerHTML = '';
+            var startIndex = (currentPage - 1) * jobsPerPage;
+            var endIndex = startIndex + jobsPerPage;
+            var jobsToDisplay = currentFilteredJobs.slice(startIndex, endIndex);
+
+            if(internshipCountSpan) internshipCountSpan.innerText = currentFilteredJobs.length;
+
+            if (jobsToDisplay.length === 0) {
+                if(internshipListDiv) internshipListDiv.innerHTML = `<p class="text-center text-gray-500 mt-8 col-span-full">Tidak ada lowongan yang sesuai dengan kriteria Anda.</p>`;
+            } else {
+                jobsToDisplay.forEach(job => {
+                    var card = `
+                        <div class="bg-white p-6 rounded-lg shadow-md transform hover:scale-105 transition duration-300 cursor-pointer" onclick="showInternshipDetail(${job.id})">
+                            <div class="flex items-center mb-4">
+                                <img src="https://placehold.co/60x60/DB2777/ffffff?text=${job.company.charAt(0)}" alt="${job.company} Logo" class="w-16 h-16 rounded-md mr-4">
+                                <div>
+                                    <h3 class="text-xl font-bold text-gray-900">${job.title}</h3>
+                                    <p class="text-gray-600">${job.company}</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center text-gray-500 text-sm mb-3">
+                                <i class="fas fa-map-marker-alt mr-2"></i> ${job.location}
+                                <span class="mx-2">•</span>
+                                <i class="fas fa-clock mr-2"></i> ${job.duration}
+                                <span class="mx-2">•</span>
+                                <i class="fas fa-wallet mr-2"></i> ${job.type}
+                                <span class="mx-2">•</span>
+                                <i class="fas fa-money-bill-wave mr-2"></i> ${job.salary}
+                                <span class="mx-2">•</span>
+                                <i class="fas fa-desktop mr-2"></i> ${job.remote}
+                            </div>
+                            <p class="text-gray-700 text-sm line-clamp-3">${job.description}</p>
+                        </div>
+                    `;
+                    if(internshipListDiv) internshipListDiv.innerHTML += card;
+                });
+            }
+            renderPagination();
+        }
+
+        function renderPagination() {
+            var paginationControls = document.getElementById('paginationControls');
+            if(paginationControls) paginationControls.innerHTML = '';
+            var totalPages = Math.ceil(currentFilteredJobs.length / jobsPerPage);
+
+            if (totalPages <= 1) return; // No pagination needed
+
+            var createPageLink = (page, text, isActive) => {
+                var button = document.createElement('button');
+                button.className = `pagination-link ${isActive ? 'active' : ''}`;
+                button.innerText = text;
+                button.onclick = () => {
+                    currentPage = page;
+                    displayInternships();
+                    // Scroll to top of internship list for better UX
+                    window.scrollTo({ top: document.getElementById('internshipList').offsetTop - 100, behavior: 'smooth' });
+                };
+                return button;
+            };
+
+            // Previous button
+            if (currentPage > 1) {
+                if(paginationControls) paginationControls.appendChild(createPageLink(currentPage - 1, '<'));
+            }
+
+            // Page numbers
+            var startPage = Math.max(1, currentPage - 1);
+            var endPage = Math.min(totalPages, currentPage + 1);
+
+            // Adjust if near beginning or end
+            if (currentPage <= 2) {
+                endPage = Math.min(totalPages, 3);
+            }
+            if (currentPage >= totalPages - 1) {
+                startPage = Math.max(1, totalPages - 2);
+            }
+
+            for (var i = startPage; i <= endPage; i++) {
+                if(paginationControls) paginationControls.appendChild(createPageLink(i, i, i === currentPage));
+            }
+
+            // Add ellipsis if needed
+            if(paginationControls) {
+                if (startPage > 1) {
+                    if (startPage > 2) paginationControls.insertBefore(document.createTextNode('...'), paginationControls.children[1]);
+                    paginationControls.insertBefore(createPageLink(1, 1), paginationControls.children[1]);
+                }
+                if (endPage < totalPages) {
+                    if (endPage < totalPages - 1) paginationControls.appendChild(document.createTextNode('...'));
+                    paginationControls.appendChild(createPageLink(totalPages, totalPages));
+                }
+            }
+
+
+            // Next button
+            if (currentPage < totalPages) {
+                if(paginationControls) paginationControls.appendChild(createPageLink(currentPage + 1, '>'));
+            }
+        }
+
+        function applyFilters() {
+            var searchInput = document.getElementById('findInternshipSearchInput').value.toLowerCase();
+            var jurusan = document.getElementById('filterJurusan').value;
+            var lokasi = document.getElementById('filterLokasi').value;
+            var durasi = document.getElementById('filterDurasi').value;
+            var type = document.getElementById('filterType').value;
+            var remote = document.getElementById('filterRemote').value;
+
+            currentFilteredJobs = simulatedJobs.filter(job => {
+                var matchesSearch = job.title.toLowerCase().includes(searchInput) ||
+                                      job.company.toLowerCase().includes(searchInput) ||
+                                      job.description.toLowerCase().includes(searchInput);
+                var matchesJurusan = !jurusan || job.jurusan === jurusan;
+                var matchesLokasi = !lokasi || job.location === lokasi;
+                var matchesDurasi = !durasi || job.duration.includes(durasi);
+                var matchesType = !type || job.type === type;
+                var matchesRemote = !remote || job.remote === remote;
+
+                return matchesSearch && matchesJurusan && matchesLokasi && matchesDurasi && matchesType && matchesRemote;
+            });
+            currentPage = 1; // Reset to first page after applying filters
+            displayInternships(); // Re-render the internship list with applied filters
+            showModal('Filter Diterapkan', `Filter Anda berhasil diterapkan. Ditemukan ${currentFilteredJobs.length} lowongan.`)
+        }
+
+        function resetFilters() {
+            if(document.getElementById('findInternshipSearchInput')) document.getElementById('findInternshipSearchInput').value = '';
+            if(document.getElementById('filterJurusan')) document.getElementById('filterJurusan').value = '';
+            if(document.getElementById('filterLokasi')) document.getElementById('filterLokasi').value = '';
+            if(document.getElementById('filterDurasi')) document.getElementById('filterDurasi').value = '';
+            if(document.getElementById('filterType')) document.getElementById('filterType').value = '';
+            if(document.getElementById('filterRemote')) document.getElementById('filterRemote').value = '';
+            currentFilteredJobs = [...simulatedJobs]; // Reset to all jobs
+            currentPage = 1;
+            displayInternships();
+            showModal('Filter Direset', 'Semua filter telah direset. Menampilkan semua lowongan.');
+        }
+
+        function searchInternships() {
+            // This function effectively acts like applyFilters but specifically for the search input
+            applyFilters();
+        }
+
+        function homeSearch() {
+            var searchTerm = document.getElementById('homeSearchInput').value;
+            if(document.getElementById('findInternshipSearchInput')) document.getElementById('findInternshipSearchInput').value = searchTerm; // Pass search term
+            showPage('find-internship');
+            // The showPage('find-internship') call already triggers applyFilters(), so no need to call it again here.
+        }
+
+        function showInternshipDetail(jobId) {
+            var job = simulatedJobs.find(j => j.id === jobId);
+            if (!job) {
+                showModal('Error', 'Lowongan tidak ditemukan.');
+                return;
+            }
+
+            // Get company logo from simulatedUserDatabase if available
+            var companyUser = simulatedUserDatabase.find(u => u.name === job.company && u.type === 'company');
+            var companyLogoUrl = companyUser && companyUser.profile.profileImageUrl ? companyUser.profile.profileImageUrl : `https://placehold.co/100x100/DB2777/ffffff?text=${job.company.charAt(0)}`;
+            
+            if(document.getElementById('detailCompanyLogo')) document.getElementById('detailCompanyLogo').src = companyLogoUrl;
+            if(document.getElementById('detailTitle')) document.getElementById('detailTitle').innerText = job.title;
+            if(document.getElementById('detailCompany')) document.getElementById('detailCompany').innerText = job.company;
+            if(document.getElementById('detailLocation')) document.getElementById('detailLocation').innerHTML = `<i class="fas fa-map-marker-alt mr-2 text-pink-strong"></i> ${job.location}`;
+            if(document.getElementById('detailDuration')) document.getElementById('detailDuration').innerHTML = `<i class="fas fa-clock mr-2 text-pink-strong"></i> ${job.duration}`;
+            if(document.getElementById('detailType')) document.getElementById('detailType').innerHTML = `<i class="fas fa-wallet mr-2 text-pink-strong"></i> ${job.type}`;
+            if(document.getElementById('detailRemote')) document.getElementById('detailRemote').innerHTML = `<i class="fas fa-desktop mr-2 text-pink-strong"></i> ${job.remote}`;
+            if(document.getElementById('detailSalary')) document.getElementById('detailSalary').innerHTML = `<i class="fas fa-money-bill-wave mr-2 text-pink-strong"></i> ${job.salary}`;
+            if(document.getElementById('detailRegistrationPeriod')) document.getElementById('detailRegistrationPeriod').innerHTML = `<i class="fas fa-calendar-alt mr-2 text-pink-strong"></i> ${formatDate(job.registrationStart)} - ${formatDate(job.registrationEnd)}`;
+            if(document.getElementById('detailDescription')) document.getElementById('detailDescription').innerText = job.description;
+
+            var qualificationsList = document.getElementById('detailQualifications');
+            if(qualificationsList) qualificationsList.innerHTML = '';
+            job.qualifications.forEach(q => {
+                var li = document.createElement('li');
+                li.innerText = q;
+                if(qualificationsList) qualificationsList.appendChild(li);
+            });
+
+            var responsibilitiesList = document.getElementById('detailResponsibilities');
+            if(responsibilitiesList) responsibilitiesList.innerHTML = '';
+            job.responsibilities.forEach(r => {
+                var li = document.createElement('li');
+                li.innerText = r;
+                if(responsibilitiesList) responsibilitiesList.appendChild(li);
+            });
+
+            currentActiveApplyJob = job; // Store the job for application process
+            showPage('internship-detail');
+        }
+
+        // Helper function to format date
+        function formatDate(dateString) {
+            var options = { day: '2-digit', month: 'long', year: 'numeric' };
+            // Ensure dateString is valid for Date object
+            if (!dateString) return '-';
+            var date = new Date(dateString);
+            return date.toLocaleDateString('id-ID', options);
+        }
+
+        // --- Apply Internship Modal Functions ---
+        var currentApplyStep = 1;
+        function showApplyModal() {
+            if (!isLoggedIn) {
+                showModal('Akses Ditolak!', 'Anda harus login untuk melamar magang.', false, null, () => showPage('login'));
+                return;
+            }
+            if (!currentActiveApplyJob) {
+                showModal('Error', 'Tidak ada lowongan yang dipilih untuk dilamar.');
+                return;
+            }
+            if(document.getElementById('applyInternshipTitle')) document.getElementById('applyInternshipTitle').innerText = currentActiveApplyJob.title;
+            currentApplyStep = 1; // Reset to step 1 every time modal is opened
+            updateApplyModalStepUI();
+            if(document.getElementById('applyModal')) document.getElementById('applyModal').classList.add('active');
+
+            // Pre-fill apply form with current user's data
+            if(document.getElementById('applyFullName')) document.getElementById('applyFullName').value = currentUserName;
+            if(document.getElementById('applyEmail')) document.getElementById('applyEmail').value = currentUserEmail;
+            if(document.getElementById('applyPhone')) document.getElementById('applyPhone').value = currentUserProfile.phone !== '-' ? currentUserProfile.phone : '';
+            // Pre-fill CV if available
+            if (currentUserProfile.cvs && currentUserProfile.cvs.length > 0) {
+                if(document.getElementById('uploadedCvName')) document.getElementById('uploadedCvName').innerText = currentUserProfile.cvs[0]; // Assume first CV is default
+            } else {
+                if(document.getElementById('uploadedCvName')) document.getElementById('uploadedCvName').innerText = 'Belum ada CV yang diunggah.';
+            }
+        }
+
+        function closeApplyModal() {
+            if(document.getElementById('applyModal')) document.getElementById('applyModal').classList.remove('active');
+            if(document.getElementById('applyForm')) document.getElementById('applyForm').reset(); // Reset form
+            if(document.getElementById('uploadedCvName')) document.getElementById('uploadedCvName').innerText = 'Belum ada CV yang diunggah.';
+        }
+
+        function updateApplyModalStepUI() {
+            document.querySelectorAll('.apply-step').forEach(step => step.classList.remove('active'));
+            document.querySelectorAll('.step-indicator').forEach(indicator => {
+                indicator.classList.remove('active', 'completed');
+            });
+
+            if(document.getElementById(`applyStep${currentApplyStep}`)) document.getElementById(`applyStep${currentApplyStep}`).classList.add('active');
+            for (var i = 1; i <= 3; i++) {
+                var indicator = document.getElementById(`step${i}Indicator`);
+                if (indicator) { // Defensive check
+                    if (i < currentApplyStep) {
+                        indicator.classList.add('completed');
+                    } else if (i === currentApplyStep) {
+                        indicator.classList.add('active');
+                    }
+                }
+            }
+
+            var prevBtn = document.getElementById('prevApplyStep');
+            var nextBtn = document.getElementById('nextApplyStep');
+            var submitBtn = document.getElementById('submitApplication');
+
+            if(prevBtn) prevBtn.classList.add('hidden');
+            if(nextBtn) nextBtn.classList.add('hidden');
+            if(submitBtn) submitBtn.classList.add('hidden');
+
+            if (currentApplyStep === 1) {
+                if(nextBtn) nextBtn.classList.remove('hidden');
+            } else if (currentApplyStep === 2) {
+                if(prevBtn) prevBtn.classList.remove('hidden');
+                if(nextBtn) nextBtn.classList.remove('hidden');
+            } else if (currentApplyStep === 3) {
+                if(prevBtn) prevBtn.classList.remove('hidden');
+                if(submitBtn) submitBtn.classList.remove('hidden');
+                // Populate confirmation data
+                if(document.getElementById('confirmTitle')) document.getElementById('confirmTitle').innerText = currentActiveApplyJob.title;
+                if(document.getElementById('confirmCompany')) document.getElementById('confirmCompany').innerText = currentActiveApplyJob.company;
+                if(document.getElementById('confirmFullName')) document.getElementById('confirmFullName').innerText = document.getElementById('applyFullName').value;
+                if(document.getElementById('confirmEmail')) document.getElementById('confirmEmail').innerText = document.getElementById('applyEmail').value;
+                if(document.getElementById('confirmPhone')) document.getElementById('confirmPhone').innerText = document.getElementById('applyPhone').value;
+                if(document.getElementById('confirmCvName')) document.getElementById('confirmCvName').innerText = document.getElementById('uploadedCvName').innerText;
+                if(document.getElementById('confirmCoverLetter')) document.getElementById('confirmCoverLetter').innerText = document.getElementById('applyCoverLetter').value || 'Tidak ada surat lamaran.';
+            }
+        }
+
+        function nextApplyStep() {
+            if (currentApplyStep === 1) {
+                // Validate CV upload
+                if (document.getElementById('uploadedCvName').innerText === 'Belum ada CV yang diunggah.') {
+                    showModal('Peringatan', 'Harap unggah CV Anda terlebih dahulu.');
+                    return;
+                }
+            } else if (currentApplyStep === 2) {
+                // Validate form fields
+                var fullName = document.getElementById('applyFullName').value;
+                var email = document.getElementById('applyEmail').value;
+                var phone = document.getElementById('applyPhone').value;
+                if (!fullName || !email || !phone) {
+                    showModal('Peringatan', 'Harap lengkapi semua kolom yang wajib diisi.');
+                    return;
+                }
+            }
+            currentApplyStep++;
+            updateApplyModalStepUI();
+        }
+
+        function prevApplyStep() {
+            currentApplyStep--;
+            updateApplyModalStepUI();
+        }
+
+        function displayFileName(inputId, targetId) {
+            var input = document.getElementById(inputId);
+            var target = document.getElementById(targetId);
+            if (input && input.files && input.files.length > 0) {
+                if(target) target.innerText = input.files[0].name;
+            } else {
+                if(target) target.innerText = 'Belum ada CV yang diunggah.';
+            }
+        }
+
+        function submitApplication() {
+            if (!currentActiveApplyJob) return;
+
+            var applicationData = {
+                jobId: currentActiveApplyJob.id, // Store jobId for linking to applicants
+                jobTitle: currentActiveApplyJob.title,
+                company: currentActiveApplyJob.company,
+                date: new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }),
+                status: 'Diajukan',
+                applicantName: document.getElementById('applyFullName').value,
+                applicantEmail: document.getElementById('applyEmail').value
+            };
+
+            // Add to simulated user's application history
+            if (currentUserProfile && currentUserProfile.applications) {
+                currentUserProfile.applications.push(applicationData);
+            } else if (currentUserProfile) {
+                currentUserProfile.applications = [applicationData];
+            } else {
+                currentUserProfile = { applications: [applicationData] };
+            }
+
+            // Update user data in simulatedUserDatabase (find by email)
+            var userIndex = simulatedUserDatabase.findIndex(u => u.email === currentUserEmail);
+            if (userIndex !== -1) {
+                simulatedUserDatabase[userIndex].profile = currentUserProfile;
+            }
+
+            // Simulate adding applicant to the job's applicant list
+            if (!simulatedJobApplicants[currentActiveApplyJob.id]) {
+                simulatedJobApplicants[currentActiveApplyJob.id] = [];
+            }
+            simulatedJobApplicants[currentActiveApplyJob.id].push({
+                name: applicationData.applicantName,
+                email: applicationData.applicantEmail,
+                jurusan: currentUserJurusan, // Assuming applicant's current jurusan
+                cv: applicationData.applicantName.replace(/\s/g, '_') + '_CV.pdf' // Simulated CV name
+            });
+
+
+            showModal('Lamaran Terkirim!', `Lamaran Anda untuk posisi ${currentActiveApplyJob.title} di ${currentActiveApplyJob.company} telah berhasil dikirim.`, false, null, () => {
+                closeApplyModal();
+                showPage('home'); // Go back to home or a confirmation page
+            });
+            console.log('Application Submitted:', applicationData); // For debugging
+        }
+
+
+        // --- Articles & Tips Functions ---
+        function displayArticles(category) {
+            var articlesList = document.getElementById('articlesList');
+            if(articlesList) articlesList.innerHTML = '';
+
+            var filteredArticles = simulatedArticles;
+            if (category !== 'all') {
+                filteredArticles = simulatedArticles.filter(article => article.category === category);
+            }
+
+            if (filteredArticles.length === 0) {
+                if(articlesList) articlesList.innerHTML = `<p class="text-center text-gray-500 col-span-full mt-8">Tidak ada artikel dalam kategori ini.</p>`;
+                return;
+            }
+
+            filteredArticles.forEach(article => {
+                var card = `
+                    <div class="bg-white p-6 rounded-lg shadow-md transform hover:scale-105 transition duration-300">
+                        <img src="${article.image}" alt="${article.title}" class="w-full h-40 object-cover rounded-md mb-4">
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">${article.title}</h3>
+                        <p class="text-gray-600 text-sm mb-3">Oleh ${article.author} | ${article.date}</p>
+                        <p class="text-gray-700 text-sm line-clamp-3">${article.content.replace(/<[^>]*>?/gm, '').substring(0, 150)}...</p>
+                        <button class="btn-secondary mt-4 px-4 py-2 text-sm" onclick="showArticleDetail(${article.id})">Baca Selengkapnya</button>
+                    </div>
+                `;
+                if(articlesList) articlesList.innerHTML += card;
+            });
+        }
+
+        function filterArticles(category) {
+            document.querySelectorAll('.article-filter-btn').forEach(btn => {
+                if (btn.dataset.category === category) {
+                    btn.classList.add('active');
+                    btn.classList.remove('border-pink-strong', 'text-pink-strong', 'hover:bg-pink-soft');
+                    btn.classList.add('bg-pink-strong', 'text-white');
+                } else {
+                    btn.classList.remove('active', 'bg-pink-strong', 'text-white');
+                    btn.classList.add('border-pink-strong', 'text-pink-strong', 'hover:bg-pink-soft');
+                }
+            });
+            displayArticles(category);
+        }
+
+        function showArticleDetail(articleId) {
+            var article = simulatedArticles.find(a => a.id === articleId);
+            if (!article) {
+                showModal('Error', 'Artikel tidak ditemukan.');
+                return;
+            }
+
+            if(document.getElementById('articleDetailImage')) document.getElementById('articleDetailImage').src = article.image;
+            if(document.getElementById('articleDetailTitle')) document.getElementById('articleDetailTitle').innerText = article.title;
+            if(document.getElementById('articleDetailAuthor')) document.getElementById('articleDetailAuthor').innerText = article.author;
+            if(document.getElementById('articleDetailDate')) document.getElementById('articleDetailDate').innerText = article.date;
+            if(document.getElementById('articleDetailContent')) document.getElementById('articleDetailContent').innerHTML = article.content; // Use innerHTML for rich text
+
+            if(document.getElementById('articleDetailModal')) document.getElementById('articleDetailModal').classList.add('active');
+        }
+
+        function closeArticleDetailModal() {
+            if(document.getElementById('articleDetailModal')) document.getElementById('articleDetailModal').classList.remove('active');
+        }
+
+        // --- Mentor Page Functions ---
+        function displayMentors() {
+            var mentorListDiv = document.getElementById('mentorList');
+            if(mentorListDiv) mentorListDiv.innerHTML = ''; // Clear previous listings
+
+            simulatedMentors.forEach(mentor => {
+                var card = `
+                    <div class="bg-white p-6 rounded-lg shadow-md text-center transform hover:scale-105 transition duration-300">
+                        <img src="${mentor.image}" alt="${mentor.name}" class="w-24 h-24 rounded-full mx-auto mb-4 object-cover">
+                        <h3 class="text-xl font-semibold mb-2">${mentor.name}</h3>
+                        <p class="text-pink-strong mb-2">${mentor.expertise}</p>
+                        <p class="text-gray-600 text-sm mb-4">${mentor.description}</p>
+                        <button class="btn-secondary px-4 py-2 text-sm" onclick="showMentorChatModal(${mentor.id})">Hubungi Mentor</button>
+                    </div>
+                `;
+                if(mentorListDiv) mentorListDiv.innerHTML += card;
+            });
+        }
+
+        function showMentorChatModal(mentorId) {
+            var mentor = simulatedMentors.find(m => m.id === mentorId);
+            if (!mentor) {
+                showModal('Error', 'Mentor tidak ditemukan.');
+                return;
+            }
+
+            var mentorChatHeader = document.getElementById('mentorChatHeader');
+            var chatMessagesDiv = document.getElementById('chatMessages');
+            var chatInput = document.getElementById('chatInput');
+
+            if(mentorChatHeader) mentorChatHeader.innerText = `Chat dengan ${mentor.name}`;
+            if(chatMessagesDiv) chatMessagesDiv.innerHTML = `
+                <div class="text-center text-gray-500 mb-4">
+                    Ini adalah simulasi chat langsung dengan ${mentor.name}. <br>
+                    Untuk diskusi mendalam, Anda dapat bergabung di grup mentor jurusan **${mentor.major}**.
+                    <p class="mt-2 italic text-xs">Pesan tidak akan disimpan.</p>
+                </div>
+            `; // Initial welcome message
+
+            if(chatInput) chatInput.value = ''; // Clear input field
+            if(chatInput) chatInput.focus(); // Focus on input field
+
+            // Store the current mentor for the send button's context
+            if(chatMessagesDiv) chatMessagesDiv.dataset.currentRecipient = mentor.name; // Use name for simple reply logic
+            if(chatMessagesDiv) chatMessagesDiv.dataset.currentRecipientType = 'mentor';
+
+            if(document.getElementById('mentorChatModal')) document.getElementById('mentorChatModal').classList.add('active');
+
+            // Add event listener for Enter key to send message
+            if(chatInput) {
+                chatInput.onkeyup = function(event) {
+                    if (event.key === 'Enter') {
+                        sendChatMessage();
+                    }
+                };
+            }
+        }
+
+        function showAdminChatModal() {
+            var mentorChatHeader = document.getElementById('mentorChatHeader');
+            var chatMessagesDiv = document.getElementById('chatMessages');
+            var chatInput = document.getElementById('chatInput');
+
+            if(mentorChatHeader) mentorChatHeader.innerText = `Chat dengan Admin`;
+            if(chatMessagesDiv) chatMessagesDiv.innerHTML = `
+                <div class="text-center text-gray-500 mb-4">
+                    Ini adalah simulasi chat dengan Admin InternLink'S. <br>
+                    Anda dapat bertanya tentang fitur perusahaan atau masalah umum.
+                    <p class="mt-2 italic text-xs">Pesan tidak akan disimpan.</p>
+                </div>
+            `; // Initial welcome message for admin chat
+
+            if(chatInput) chatInput.value = ''; // Clear input field
+            if(chatInput) chatInput.focus(); // Focus on input field
+
+            if(chatMessagesDiv) chatMessagesDiv.dataset.currentRecipient = 'Admin';
+            if(chatMessagesDiv) chatMessagesDiv.dataset.currentRecipientType = 'admin';
+
+            if(document.getElementById('mentorChatModal')) document.getElementById('mentorChatModal').classList.add('active'); // Reuse mentor chat modal
+
+            if(chatInput) {
+                chatInput.onkeyup = function(event) {
+                    if (event.key === 'Enter') {
+                        sendChatMessage();
+                    }
+                };
+            }
+        }
+
+        function sendChatMessage() {
+            var chatInput = document.getElementById('chatInput');
+            var chatMessagesDiv = document.getElementById('chatMessages');
+            var userMessage = chatInput ? chatInput.value.trim() : '';
+            var recipientType = chatMessagesDiv ? chatMessagesDiv.dataset.currentRecipientType : '';
+            var recipientName = chatMessagesDiv ? chatMessagesDiv.dataset.currentRecipient : '';
+
+            if (!userMessage) return;
+
+            // Append user message
+            if(chatMessagesDiv) chatMessagesDiv.innerHTML += `
+                <div class="flex justify-end mb-2">
+                    <div class="bg-blue-100 text-blue-800 p-2 rounded-lg max-w-xs break-words">
+                        ${userMessage}
+                    </div>
+                </div>
+            `;
+            if(chatInput) chatInput.value = ''; // Clear input
+            if(chatMessagesDiv) chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight; // Scroll to bottom
+
+            // Simulate reply after a short delay
+            setTimeout(() => {
+                var replyMessage;
+                if (recipientType === 'mentor') {
+                    var mentor = simulatedMentors.find(m => m.name === recipientName);
+                    replyMessage = getMentorSimulatedReply(mentor, userMessage);
+                } else if (recipientType === 'admin') {
+                    replyMessage = getAdminSimulatedReply(userMessage);
+                }
+
+                if(chatMessagesDiv) chatMessagesDiv.innerHTML += `
+                    <div class="flex justify-start mb-2">
+                        <div class="bg-gray-200 text-gray-800 p-2 rounded-lg max-w-xs break-words">
+                            <strong>${recipientName}:</strong> ${replyMessage}
+                        </div>
+                    </div>
+                `;
+                if(chatMessagesDiv) chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight; // Scroll to bottom
+            }, 1000); // 1 second delay
+        }
+
+        function getMentorSimulatedReply(mentor, userMessage) {
+            var lowerMessage = userMessage.toLowerCase();
+            if (lowerMessage.includes('magang') || lowerMessage.includes('internship')) {
+                return `Tentu, saya bisa bantu terkait magang. Di jurusan ${mentor.major}, fokus utama biasanya adalah ${mentor.expertise.toLowerCase()}. Ada pertanyaan spesifik?`;
+            } else if (lowerMessage.includes('cv') || lowerMessage.includes('resume')) {
+                return `Untuk CV, pastikan menonjolkan pengalaman relevan Anda. Ada bagian yang ingin kita diskusikan?`;
+            } else if (lowerMessage.includes('wawancara') || lowerMessage.includes('interview')) {
+                return `Wawancara itu kesempatanmu bersinar! Pertanyaan apa yang paling membuatmu khawatir?`;
+            } else if (lowerMessage.includes('terima kasih') || lowerMessage.includes('thanks')) {
+                return `Sama-sama! Senang bisa membantu. Ada lagi yang bisa saya bantu?`;
+            } else if (lowerMessage.includes('grup') || lowerMessage.includes('komunitas')) {
+                return `Grup chat mentor untuk jurusan ${mentor.major} sangat aktif! Di sana kita sering bahas ${mentor.expertise.toLowerCase()} dan tips karir.`;
+            } else if (lowerMessage.includes('halo') || lowerMessage.includes('hi') || lowerMessage.includes('hai')) {
+                return `Halo juga! Ada yang bisa saya bantu terkait karir atau magang?`;
+            }
+            return `Baik, terima kasih atas pesannya. Apa ada hal lain yang ingin Anda diskusikan?`;
+        }
+
+        function getAdminSimulatedReply(userMessage) {
+            var lowerMessage = userMessage.toLowerCase();
+            if (lowerMessage.includes('lowongan') || lowerMessage.includes('posting')) {
+                return `Tentu, Anda bisa menambahkan dan mengelola lowongan magang Anda di tab 'Lowongan Saya' di halaman profil. Ada kendala saat posting?`;
+            } else if (lowerMessage.includes('akun') || lowerMessage.includes('perusahaan')) {
+                return `Untuk pertanyaan terkait akun perusahaan atau verifikasi, mohon berikan detail email Anda agar kami bisa memeriksanya.`;
+            } else if (lowerMessage.includes('teknis') || lowerMessage.includes('bug')) {
+                return `Mohon jelaskan masalah teknis yang Anda alami secara lebih rinci. Kami akan berusaha membantu secepatnya.`;
+            } else if (lowerMessage.includes('terima kasih')) {
+                return `Sama-sama! Kami senang dapat membantu.`;
+            }
+            return `Halo! Ada yang bisa kami bantu terkait akun perusahaan atau penggunaan InternLink'S?`;
+        }
+
+        function closeMentorChatModal() { 
+            if(document.getElementById('mentorChatModal')) document.getElementById('mentorChatModal').classList.remove('active');
+            if(document.getElementById('chatMessages')) document.getElementById('chatMessages').innerHTML = ''; // Clear chat history when closing
+            var chatInput = document.getElementById('chatInput');
+            if (chatInput) chatInput.onkeyup = null; // Remove event listener safely
+            if (chatInput) chatInput.value = ''; // Clear any remaining input safely
+            var chatMessagesDiv = document.getElementById('chatMessages'); // Get it again for dataset clearing
+            if (chatMessagesDiv) {
+                delete chatMessagesDiv.dataset.currentRecipient;
+                delete chatMessagesDiv.dataset.currentRecipientType;
+            }
+        }
+
+        // --- Profile Page Functions ---
+        function loadProfileData() {
+            if (!isLoggedIn || !currentUserProfile) {
+                console.error("User not logged in or profile data not available.");
+                return;
+            }
+
+            // Get common elements first
+            var profileNameDisplay = document.getElementById('profileNameDisplay');
+            var profileJurusanDisplay = document.getElementById('profileJurusanDisplay');
+            var profileAvatar = document.getElementById('profileAvatar');
+            var academicBiodataTab = document.getElementById('academicBiodataTab');
+            var editNameLabel = document.getElementById('editNameLabel');
+            var editJurusanLabel = document.getElementById('editJurusanLabel');
+            var imageUploadLabel = document.getElementById('imageUploadLabel');
+
+            var viewAddress = document.getElementById('viewAddress');
+            var viewPhone = document.getElementById('viewPhone');
+            var viewEmail = document.getElementById('viewEmail');
+            var editName = document.getElementById('editName');
+            var editJurusan = document.getElementById('editJurusan');
+            var editAddress = document.getElementById('editAddress');
+            var editPhone = document.getElementById('editPhone');
+            var editEmail = document.getElementById('editEmail');
+
+            // Get conditionally visible rows/containers for intern-specific data
+            var viewBirthDateRow = document.getElementById('viewBirthDateRow');
+            var viewEducationRow = document.getElementById('viewEducationRow');
+            var viewOrganizationRow = document.getElementById('viewOrganizationRow');
+            var viewSkillsRow = document.getElementById('viewSkillsRow');
+
+            var editBirthDateContainer = document.getElementById('editBirthDateContainer');
+            var editEducationContainer = document.getElementById('editEducationContainer');
+            var editOrganizationContainer = document.getElementById('editOrganizationContainer');
+            var editSkillsContainer = document.getElementById('editSkillsContainer');
+
+            // Update common display elements
+            if (profileNameDisplay) profileNameDisplay.innerText = currentUserName;
+
+            // Conditional display based on user type
+            if (currentUserType === 'intern') {
+                if (profileJurusanDisplay) {
+                    profileJurusanDisplay.innerText = currentUserJurusan || 'Belum diisi';
+                    profileJurusanDisplay.classList.remove('hidden'); 
+                }
+                
+                if (academicBiodataTab) academicBiodataTab.innerText = 'Biodata Akademik';
+                if (editNameLabel) editNameLabel.innerText = 'Nama Lengkap';
+                if (editJurusanLabel) editJurusanLabel.innerText = 'Jurusan';
+                if (imageUploadLabel) imageUploadLabel.innerText = 'Unggah Foto Profil';
+
+                // Show intern-specific fields
+                if (viewBirthDateRow) viewBirthDateRow.classList.remove('hidden');
+                if (viewEducationRow) viewEducationRow.classList.remove('hidden');
+                if (viewOrganizationRow) viewOrganizationRow.classList.remove('hidden');
+                if (viewSkillsRow) viewSkillsRow.classList.remove('hidden');
+
+                if (editBirthDateContainer) editBirthDateContainer.classList.remove('hidden');
+                if (editEducationContainer) editEducationContainer.classList.remove('hidden');
+                if (editOrganizationContainer) editOrganizationContainer.classList.remove('hidden');
+                if (editSkillsContainer) editSkillsContainer.classList.remove('hidden');
+
+                // Load intern-specific profile data for view mode
+                if (document.getElementById('viewBirthDate')) document.getElementById('viewBirthDate').innerText = currentUserProfile.birthDate || '-';
+                if (document.getElementById('viewEducation')) document.getElementById('viewEducation').innerText = currentUserProfile.education || '-';
+                if (document.getElementById('viewOrganization')) document.getElementById('viewOrganization').innerText = currentUserProfile.organization || '-';
+                if (document.getElementById('viewSkills')) document.getElementById('viewSkills').innerText = currentUserProfile.skills || '-';
+
+                // Load intern-specific profile data for edit mode
+                if (editJurusan) editJurusan.value = currentUserJurusan;
+                if (document.getElementById('editBirthDate')) document.getElementById('editBirthDate').value = currentUserProfile.birthDate || '';
+                if (document.getElementById('editEducation')) document.getElementById('editEducation').value = currentUserProfile.education || '';
+                if (document.getElementById('editOrganization')) document.getElementById('editOrganization').value = currentUserProfile.organization || '';
+                if (document.getElementById('editSkills')) document.getElementById('editSkills').value = currentUserProfile.skills || '';
+
+            } else { // company
+                if (profileJurusanDisplay) {
+                    profileJurusanDisplay.innerText = currentUserProfile.industry || 'Industri belum diisi';
+                    profileJurusanDisplay.classList.remove('hidden'); 
+                }
+
+                if (academicBiodataTab) academicBiodataTab.innerText = 'Biodata Perusahaan';
+                if (editNameLabel) editNameLabel.innerText = 'Nama Perusahaan';
+                if (editJurusanLabel) editJurusanLabel.innerText = 'Industri Perusahaan';
+                if (imageUploadLabel) imageUploadLabel.innerText = 'Unggah Logo Perusahaan';
+
+                // Hide intern-specific fields for companies
+                if (viewBirthDateRow) viewBirthDateRow.classList.add('hidden');
+                if (viewEducationRow) viewEducationRow.classList.add('hidden');
+                if (viewOrganizationRow) viewOrganizationRow.classList.add('hidden');
+                if (viewSkillsRow) viewSkillsRow.classList.add('hidden');
+
+                if (editBirthDateContainer) editBirthDateContainer.classList.add('hidden');
+                if (editEducationContainer) editEducationContainer.classList.add('hidden');
+                if (editOrganizationContainer) editOrganizationContainer.classList.add('hidden');
+                if (editSkillsContainer) editSkillsContainer.classList.add('hidden');
+
+                // Load company-specific profile data for edit mode
+                if (editJurusan) editJurusan.value = currentUserProfile.industry || ''; // 'Jurusan' input is 'Industry' for company
+            }
+
+            // Common fields for both types (view and edit)
+            if (profileAvatar) profileAvatar.src = currentUserProfile.profileImageUrl || (currentUserType === 'intern' ? 'https://placehold.co/120x120/FBCFE8/DB2777?text=User' : 'https://placehold.co/120x120/DB2777/ffffff?text=Logo');
+
+            if (viewAddress) viewAddress.innerText = currentUserProfile.address || '-';
+            if (viewPhone) viewPhone.innerText = currentUserProfile.phone || '-';
+            if (viewEmail) viewEmail.innerText = currentUserProfile.email || currentUserEmail; // Fallback to login email
+            
+            if (editName) editName.value = currentUserName;
+            if (editAddress) editAddress.value = currentUserProfile.address || '';
+            if (editPhone) editPhone.value = currentUserProfile.phone || '';
+            if (editEmail) editEmail.value = currentUserProfile.email || currentUserEmail;
+
+            // Ensure view mode is active by default when profile page is loaded
+            toggleBiodataEditMode(false);
+
+            // Conditional tab loading
+            var cvPortfolioTab = document.getElementById('cvPortfolioTab');
+            if (cvPortfolioTab) { // Check if element exists
+                if (currentUserType === 'intern') {
+                    cvPortfolioTab.classList.remove('hidden');
+                    loadCvPortfolio();
+                } else {
+                    cvPortfolioTab.classList.add('hidden');
+                }
+            }
+
+            var applicationHistoryTab = document.querySelector('[data-tab="application-history"]');
+            if (applicationHistoryTab) { // Check if element exists
+                if (currentUserType === 'intern') {
+                    applicationHistoryTab.classList.remove('hidden');
+                    loadApplicationHistory();
+                } else { // Hide application history section for companies
+                     applicationHistoryTab.classList.add('hidden');
+                     var applicationHistoryList = document.getElementById('applicationHistoryList');
+                     var noApplicationsMessage = document.getElementById('noApplicationsMessage');
+                     if(applicationHistoryList) applicationHistoryList.innerHTML = ''; // Clear any displayed applications
+                     if(noApplicationsMessage) noApplicationsMessage.classList.remove('hidden'); // Ensure message is visible
+                }
+            }
+
+            var myJobPostingsTab = document.getElementById('myJobPostingsTab');
+            if (myJobPostingsTab) { // Check if element exists
+                if (currentUserType === 'company') {
+                    myJobPostingsTab.classList.remove('hidden');
+                    displayMyJobPostings();
+                } else {
+                    myJobPostingsTab.classList.add('hidden');
+                }
+            }
+        }
+
+        function handleProfileImageUpload(event) {
+            var file = event.target.files[0];
+            if (file) {
+                if (file.size > 1024 * 1024) { // Max 1MB
+                    showModal('Ukuran File Terlalu Besar', 'Ukuran gambar maksimal adalah 1MB.');
+                    event.target.value = ''; // Clear file input
+                    return;
+                }
+
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    var imageUrl = e.target.result;
+                    var profileAvatar = document.getElementById('profileAvatar');
+                    if (profileAvatar) profileAvatar.src = imageUrl; // Update displayed image
+                    currentUserProfile.profileImageUrl = imageUrl; // Store in profile data
+
+                    // Update user in simulatedUserDatabase
+                    var userIndex = simulatedUserDatabase.findIndex(u => u.email === currentUserEmail);
+                    if (userIndex !== -1) {
+                        simulatedUserDatabase[userIndex].profile.profileImageUrl = imageUrl;
+                    }
+                    showModal('Unggah Berhasil', currentUserType === 'intern' ? 'Foto profil Anda berhasil diunggah.' : 'Logo perusahaan Anda berhasil diunggah.');
+                };
+                reader.readAsDataURL(file); // Read as Base64
+            }
+        }
+
+
+        function toggleBiodataEditMode(isEdit) {
+            var biodataViewMode = document.getElementById('biodataViewMode');
+            var biodataEditMode = document.getElementById('biodataEditMode');
+            if (isEdit) {
+                if(biodataViewMode) biodataViewMode.classList.add('hidden');
+                if(biodataEditMode) biodataEditMode.classList.remove('hidden');
+            } else {
+                if(biodataViewMode) biodataViewMode.classList.remove('hidden');
+                if(biodataEditMode) biodataEditMode.classList.add('hidden');
+            }
+        }
+
+        function saveBiodata() {
+            // Update current user's profile data
+            currentUserName = document.getElementById('editName').value;
+            currentUserProfile.address = document.getElementById('editAddress').value;
+            currentUserProfile.phone = document.getElementById('editPhone').value;
+            currentUserProfile.email = document.getElementById('editEmail').value;
+
+            if (currentUserType === 'intern') {
+                currentUserJurusan = document.getElementById('editJurusan').value;
+                currentUserProfile.birthDate = document.getElementById('editBirthDate').value;
+                currentUserProfile.education = document.getElementById('editEducation').value;
+                currentUserProfile.organization = document.getElementById('editOrganization').value;
+                currentUserProfile.skills = document.getElementById('editSkills').value;
+            } else { // company
+                currentUserProfile.industry = document.getElementById('editJurusan').value; // 'Jurusan' input is 'Industry' for company
+                // Clear intern-specific fields from company profile
+                currentUserProfile.birthDate = '-';
+                currentUserProfile.education = '-';
+                currentUserProfile.organization = '-';
+                currentUserProfile.skills = '-';
+            }
+
+            currentUserProfile.isProfileCompleted = true; // Mark profile as completed
+
+            // Update user in simulatedUserDatabase
+            var userIndex = simulatedUserDatabase.findIndex(u => u.email === currentUserEmail);
+            if (userIndex !== -1) {
+                simulatedUserDatabase[userIndex].name = currentUserName;
+                if (currentUserType === 'intern') {
+                    simulatedUserDatabase[userIndex].jurusan = currentUserJurusan; // Also update top-level jurusan for intern
+                } else {
+                    simulatedUserDatabase[userIndex].industry = currentUserProfile.industry; // Update top-level industry for company
+                }
+                simulatedUserDatabase[userIndex].profile = currentUserProfile;
+            }
+
+            updateAuthUI(); // Update name in header
+            loadProfileData(); // Reload view mode with new data
+            toggleBiodataEditMode(false);
+            showModal('Profil Diperbarui', 'Biodata Anda telah berhasil diperbarui.');
+        }
+
+        function switchProfileTab(tabId) {
+            document.querySelectorAll('.profile-tab-content').forEach(content => content.classList.add('hidden'));
+            var targetTabContent = document.getElementById(tabId);
+            if(targetTabContent) targetTabContent.classList.remove('hidden');
+
+            document.querySelectorAll('.tab-button').forEach(button => {
+                if (button.dataset.tab === tabId) {
+                    button.classList.add('active-tab', 'border-pink-strong', 'text-pink-strong');
+                    button.classList.remove('border-transparent', 'text-gray-600');
+                } else {
+                    button.classList.remove('active-tab', 'border-pink-strong', 'text-pink-strong');
+                    button.classList.add('border-transparent', 'text-gray-600');
+                }
+            });
+            // Specific logic for tabs
+            if (tabId === 'cv-portfolio') {
+                loadCvPortfolio();
+            } else if (tabId === 'application-history') {
+                loadApplicationHistory(); // Load with current filters
+            } else if (tabId === 'my-job-postings') {
+                displayMyJobPostings();
+            }
+        }
+
+        function addCvFile(event) {
+            if (event.target.files.length > 0) {
+                var fileName = event.target.files[0].name;
+                if (!currentUserProfile.cvs.includes(fileName)) { // Prevent duplicates
+                    currentUserProfile.cvs.push(fileName);
+                    loadCvPortfolio();
+                    showModal('Unggah CV', `CV "${fileName}" berhasil diunggah (simulasi).`);
+                } else {
+                    showModal('Peringatan', `CV "${fileName}" sudah ada.`);
+                }
+                event.target.value = ''; // Clear file input
+            }
+        }
+
+        function addPortfolioFile(event) {
+            if (event.target.files.length > 0) {
+                var fileName = event.target.files[0].name;
+                if (!currentUserProfile.portfolios.includes(fileName)) { // Prevent duplicates
+                    currentUserProfile.portfolios.push(fileName);
+                    loadCvPortfolio();
+                    showModal('Unggah Portofolio', `Portofolio "${fileName}" berhasil diunggah (simulasi).`);
+                } else {
+                    showModal('Peringatan', `Portofolio "${fileName}" sudah ada.`);
+                }
+                event.target.value = ''; // Clear file input
+            }
+        }
+
+        function loadCvPortfolio() {
+            var cvList = document.getElementById('cvList');
+            var portfolioList = document.getElementById('portfolioList');
+            if (!cvList || !portfolioList) return; // Defensive check
+
+            cvList.innerHTML = '';
+            portfolioList.innerHTML = '';
+
+            if (currentUserProfile.cvs && currentUserProfile.cvs.length > 0) {
+                currentUserProfile.cvs.forEach((cvName, index) => {
+                    cvList.innerHTML += `
+                        <div class="bg-gray-50 p-4 rounded-lg flex justify-between items-center border border-gray-200">
+                            <span><i class="fas fa-file-pdf text-red-500 mr-2"></i> ${cvName}</span>
+                            <button class="text-red-500 hover:text-red-700 text-lg" onclick="removeFile('cv', '${cvName}')"><i class="fas fa-trash"></i></button>
+                        </div>
+                    `;
+                });
+            } else {
+                cvList.innerHTML = `<p class="text-gray-500 italic">Belum ada CV yang diunggah.</p>`;
+            }
+
+            if (currentUserProfile.portfolios && currentUserProfile.portfolios.length > 0) {
+                currentUserProfile.portfolios.forEach((portName, index) => {
+                    var icon = portName.toLowerCase().endsWith('.pdf') ? 'fas fa-file-pdf text-red-500' : 'fas fa-image text-blue-500';
+                    portfolioList.innerHTML += `
+                        <div class="bg-gray-50 p-4 rounded-lg flex justify-between items-center border border-gray-200">
+                            <span><i class="${icon} mr-2"></i> ${portName}</span>
+                            <button class="text-red-500 hover:text-red-700 text-lg" onclick="removeFile('portfolio', '${portName}')"><i class="fas fa-trash"></i></button>
+                        </div>
+                    `;
+                });
+            } else {
+                portfolioList.innerHTML = `<p class="text-gray-500 italic">Belum ada item portofolio yang diunggah.</p>`;
+            }
+        }
+
+        function removeFile(type, fileName) {
+            showModal('Hapus File', `Apakah Anda yakin ingin menghapus ${fileName}?`, true, `confirmRemoveFile('${type}', '${fileName}')`);
+        }
+
+        function confirmRemoveFile(type, fileName) {
+            if (type === 'cv') {
+                currentUserProfile.cvs = currentUserProfile.cvs.filter(cv => cv !== fileName);
+            } else if (type === 'portfolio') {
+                currentUserProfile.portfolios = currentUserProfile.portfolios.filter(port => port !== fileName);
+            }
+            // Update user data in simulatedUserDatabase (find by email)
+            var userIndex = simulatedUserDatabase.findIndex(u => u.email === currentUserEmail);
+            if (userIndex !== -1) {
+                simulatedUserDatabase[userIndex].profile = currentUserProfile;
+            }
+            loadCvPortfolio(); // Reload the list after removal
+            showModal('Berhasil Dihapus', `${fileName} telah dihapus.`);
+        }
+
+        function loadApplicationHistory() {
+            var applicationHistoryList = document.getElementById('applicationHistoryList');
+            var noApplicationsMessage = document.getElementById('noApplicationsMessage');
+            if (!applicationHistoryList || !noApplicationsMessage) return; // Defensive check
+
+            applicationHistoryList.innerHTML = '';
+
+            // Apply filters first
+            var filteredApplications = filterApplicationHistoryData(); // New function to handle filtering
+
+            if (filteredApplications.length === 0) {
+                noApplicationsMessage.classList.remove('hidden');
+            } else {
+                noApplicationsMessage.classList.add('hidden');
+                // Sort applications by date, newest first
+                var sortedApplications = [...filteredApplications].sort((a, b) => {
+                    var dateA = new Date(a.date.split(' ').reverse().join('-').replace(/(\d{2}) (.*) (\d{4})/, '$2 $1, $3'));
+                    var dateB = new Date(b.date.split(' ').reverse().join('-').replace(/(\d{2}) (.*) (\d{4})/, '$2 $1, $3'));
+                    return dateB - dateA;
+                });
+
+                sortedApplications.forEach(app => {
+                    // Get full job details for criteria display
+                    var jobDetails = simulatedJobs.find(job => job.id === app.jobId);
+                    var jobInfo = jobDetails ? `
+                        <p class="text-sm text-gray-600">Lokasi: ${jobDetails.location} • Durasi: ${jobDetails.duration}</p>
+                        <p class="text-sm text-gray-600">Jenis: ${jobDetails.type} • Mode: ${jobDetails.remote}</p>
+                        <p class="text-sm text-gray-600">Gaji: ${jobDetails.salary} • Jurusan: ${jobDetails.jurusan}</p>
+                        <p class="text-sm text-gray-500">Pendaftaran: ${formatDate(jobDetails.registrationStart)} - ${formatDate(jobDetails.registrationEnd)}</p>
+                    ` : '';
+
+                    applicationHistoryList.innerHTML += `
+                        <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 flex flex-col sm:flex-row justify-between items-start sm:items-center">
+                            <div class="mb-2 sm:mb-0">
+                                <p class="font-semibold text-gray-800">${app.jobTitle}</p>
+                                <p class="text-sm text-gray-600">${app.company}</p>
+                                ${jobInfo}
+                                <p class="text-sm text-gray-500 mt-1">Diajukan: ${app.date}</p>
+                            </div>
+                            <span class="px-3 py-1 bg-yellow-100 text-yellow-800 text-xs font-semibold rounded-full">${app.status}</span>
+                        </div>
+                    `;
+                });
+            }
+        }
+
+        function filterApplicationHistoryData() {
+            if (!currentUserProfile.applications) return [];
+
+            var appHistoryFilterJurusan = document.getElementById('appHistoryFilterJurusan');
+            var appHistoryFilterLokasi = document.getElementById('appHistoryFilterLokasi');
+            var appHistoryFilterType = document.getElementById('appHistoryFilterType');
+            var appHistoryFilterRemote = document.getElementById('appHistoryFilterRemote');
+
+            var jurusanFilter = appHistoryFilterJurusan ? appHistoryFilterJurusan.value : '';
+            var lokasiFilter = appHistoryFilterLokasi ? appHistoryFilterLokasi.value : '';
+            var typeFilter = appHistoryFilterType ? appHistoryFilterType.value : '';
+            var remoteFilter = appHistoryFilterRemote ? appHistoryFilterRemote.value : '';
+
+
+            return currentUserProfile.applications.filter(app => {
+                var job = simulatedJobs.find(j => j.id === app.jobId);
+                if (!job) return false; // If job details aren't found, exclude
+
+                var matchesJurusan = !jurusanFilter || job.jurusan === jurusanFilter;
+                var matchesLokasi = !lokasiFilter || job.location === lokasiFilter;
+                var matchesType = !typeFilter || job.type === typeFilter;
+                var matchesRemote = !remoteFilter || job.remote === remoteFilter;
+
+                return matchesJurusan && matchesLokasi && matchesType && matchesRemote;
+            });
+        }
+
+        function filterApplicationHistory() {
+            loadApplicationHistory(); // Re-load the list with current filter values
+            showModal('Filter Diterapkan', 'Filter riwayat lamaran berhasil diterapkan.');
+        }
+
+        function resetApplicationHistoryFilters() {
+            if(document.getElementById('appHistoryFilterJurusan')) document.getElementById('appHistoryFilterJurusan').value = '';
+            if(document.getElementById('appHistoryFilterLokasi')) document.getElementById('appHistoryFilterLokasi').value = '';
+            if(document.getElementById('appHistoryFilterType')) document.getElementById('appHistoryFilterType').value = '';
+            if(document.getElementById('appHistoryFilterRemote')) document.getElementById('appHistoryFilterRemote').value = '';
+            loadApplicationHistory(); // Re-load without filters
+            showModal('Filter Direset', 'Filter riwayat lamaran telah direset.');
+        }
+
+        // Dummy delete account function
+        function deleteAccount() {
+            // In a real app, this would send a request to the backend to delete the user.
+            // For this prototype, we'll just log out and remove from simulated database.
+            var userIndex = simulatedUserDatabase.findIndex(u => u.email === currentUserEmail);
+            if (userIndex !== -1) {
+                simulatedUserDatabase.splice(userIndex, 1);
+            }
+            logout();
+            showModal('Akun Dihapus', 'Akun Anda telah berhasil dihapus (simulasi).', false, null, () => showPage('home'));
+        }
+
+        // --- Add/Edit Job Posting Functions ---
+        var nextJobId = simulatedJobs.length > 0 ? Math.max(...simulatedJobs.map(job => job.id)) + 1 : 1;
+
+        function handleAddJobPosting(event) {
+            event.preventDefault();
+
+            var jobId = document.getElementById('jobIdToEdit').value;
+            var jobTitle = document.getElementById('jobTitle').value;
+            var jobCompany = document.getElementById('jobCompany').value;
+            var jobLocation = document.getElementById('jobLocation').value;
+            var jobDuration = document.getElementById('jobDuration').value;
+            var jobSalary = document.getElementById('jobSalary').value;
+            var jobRegistrationStart = document.getElementById('jobRegistrationStart').value;
+            var jobRegistrationEnd = document.getElementById('jobRegistrationEnd').value;
+            var jobType = document.getElementById('jobType').value;
+            var jobRemote = document.getElementById('jobRemote').value;
+            var jobJurusan = document.getElementById('jobJurusan').value;
+            var jobDescription = document.getElementById('jobDescription').value;
+            var jobQualifications = document.getElementById('jobQualifications').value.split('\n').filter(line => line.trim() !== '');
+            var jobResponsibilities = document.getElementById('jobResponsibilities').value.split('\n').filter(line => line.trim() !== '');
+
+            var jobData = {
+                title: jobTitle,
+                company: jobCompany,
+                location: jobLocation,
+                duration: jobDuration,
+                salary: jobSalary,
+                registrationStart: jobRegistrationStart,
+                registrationEnd: jobRegistrationEnd,
+                type: jobType,
+                remote: jobRemote,
+                jurusan: jobJurusan,
+                description: jobDescription,
+                qualifications: jobQualifications,
+                responsibilities: jobResponsibilities
+            };
+
+            if (jobId) { // Editing existing job
+                var index = simulatedJobs.findIndex(j => j.id == jobId);
+                if (index !== -1) {
+                    simulatedJobs[index] = { id: parseInt(jobId), ...jobData }; // Ensure ID is preserved
+                    showModal('Lowongan Diperbarui', `Lowongan "${jobTitle}" berhasil diperbarui!`, false, null, () => {
+                        if(document.getElementById('addJobForm')) document.getElementById('addJobForm').reset();
+                        editingJobId = null; // Clear editing state
+                        showPage('profile'); // Go back to profile (My Job Postings)
+                    });
+                    console.log('Job Updated:', simulatedJobs[index]);
+                } else {
+                    showModal('Error', 'Lowongan tidak ditemukan untuk diperbarui.');
+                }
+            } else { // Adding new job
+                var newJob = { id: nextJobId++, ...jobData };
+                simulatedJobs.push(newJob);
+                showModal('Lowongan Berhasil Diposting', `Lowongan "${newJob.title}" dari ${newJob.company} berhasil diposting!`, false, null, () => {
+                    if(document.getElementById('addJobForm')) document.getElementById('addJobForm').reset(); // Reset the form
+                    showPage('profile'); // Redirect to profile (My Job Postings)
+                });
+                console.log('New Job Posted:', newJob);
+            }
+        }
+
+        // --- Company Job Management Functions (My Job Postings Tab) ---
+        function displayMyJobPostings() {
+            var myJobPostingsList = document.getElementById('myJobPostingsList');
+            var noMyPostingsMessage = document.getElementById('noMyPostingsMessage');
+            if (!myJobPostingsList || !noMyPostingsMessage) return; // Defensive check
+
+            myJobPostingsList.innerHTML = ''; // Clear previous listings
+
+            var myPostedJobs = simulatedJobs.filter(job => job.company === currentUserName);
+
+            if (myPostedJobs.length === 0) {
+                noMyPostingsMessage.classList.remove('hidden');
+            } else {
+                noMyPostingsMessage.classList.add('hidden');
+                myPostedJobs.forEach(job => {
+                    var card = `
+                        <div class="bg-white p-6 rounded-lg shadow-md flex flex-col md:flex-row justify-between items-center mb-4">
+                            <div class="mb-4 md:mb-0 md:w-3/5 text-center md:text-left">
+                                <h3 class="text-xl font-bold text-gray-900">${job.title}</h3>
+                                <p class="text-gray-600">${job.location} • ${job.duration}</p>
+                                <p class="text-gray-500 text-sm">Pendaftaran: ${formatDate(job.registrationStart)} - ${formatDate(job.registrationEnd)}</p>
+                            </div>
+                            <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 md:space-x-4">
+                                <button class="btn-secondary px-4 py-2 text-sm" onclick="editJobPosting(${job.id})">Edit</button>
+                                <button class="bg-red-500 text-white px-4 py-2 rounded-full hover:bg-red-700 transition duration-300 text-sm" onclick="confirmDeleteJob(${job.id})">Hapus</button>
+                                <button class="btn-primary px-4 py-2 text-sm" onclick="showApplicantsModal(${job.id})">Lihat Pelamar</button>
+                            </div>
+                        </div>
+                    `;
+                    myJobPostingsList.innerHTML += card;
+                });
+            }
+        }
+
+        function editJobPosting(jobId) {
+            var job = simulatedJobs.find(j => j.id === jobId);
+            if (!job) {
+                showModal('Error', 'Lowongan tidak ditemukan untuk diedit.');
+                return;
+            }
+
+            editingJobId = jobId; // Set the global state for editing
+            if(document.getElementById('addEditJobTitle')) document.getElementById('addEditJobTitle').innerText = 'Edit Lowongan Magang';
+            if(document.getElementById('jobIdToEdit')) document.getElementById('jobIdToEdit').value = job.id; // Store ID in hidden field
+            if(document.getElementById('jobTitle')) document.getElementById('jobTitle').value = job.title;
+            if(document.getElementById('jobCompany')) document.getElementById('jobCompany').value = job.company;
+            if(document.getElementById('jobLocation')) document.getElementById('jobLocation').value = job.location;
+            if(document.getElementById('jobDuration')) document.getElementById('jobDuration').value = job.duration;
+            if(document.getElementById('jobSalary')) document.getElementById('jobSalary').value = job.salary;
+            if(document.getElementById('jobRegistrationStart')) document.getElementById('jobRegistrationStart').value = job.registrationStart;
+            if(document.getElementById('jobRegistrationEnd')) document.getElementById('jobRegistrationEnd').value = job.registrationEnd;
+            if(document.getElementById('jobType')) document.getElementById('jobType').value = job.type;
+            if(document.getElementById('jobRemote')) document.getElementById('jobRemote').value = job.remote;
+            if(document.getElementById('jobJurusan')) document.getElementById('jobJurusan').value = job.jurusan;
+            if(document.getElementById('jobDescription')) document.getElementById('jobDescription').value = job.description;
+            if(document.getElementById('jobQualifications')) document.getElementById('jobQualifications').value = job.qualifications.join('\n');
+            if(document.getElementById('jobResponsibilities')) document.getElementById('jobResponsibilities').value = job.responsibilities.join('\n');
+
+            if(document.getElementById('submitJobButton')) document.getElementById('submitJobButton').innerText = 'Simpan Perubahan';
+
+            showPage('add-job-posting');
+        }
+
+        function confirmDeleteJob(jobId) {
+            showModal('Hapus Lowongan', 'Apakah Anda yakin ingin menghapus lowongan ini? Tindakan ini tidak dapat dibatalkan.', true, `deleteJob(${jobId})`);
+        }
+
+        function deleteJob(jobId) {
+            var initialLength = simulatedJobs.length;
+            simulatedJobs.splice(simulatedJobs.findIndex(j => j.id === jobId), 1);
+            if (simulatedJobs.length < initialLength) {
+                showModal('Lowongan Dihapus', 'Lowongan berhasil dihapus.', false, null, () => displayMyJobPostings()); // Refresh list
+            } else {
+                showModal('Error', 'Gagal menghapus lowongan.');
+            }
+        }
+
+        function showApplicantsModal(jobId) {
+            var job = simulatedJobs.find(j => j.id === jobId);
+            if (!job) {
+                showModal('Error', 'Lowongan tidak ditemukan.');
+                return;
+            }
+
+            var applicantsModalHeader = document.getElementById('applicantsModalHeader');
+            var applicantsListDiv = document.getElementById('applicantsList');
+            var applicantsCountSpan = document.getElementById('applicantsCount');
+            var noApplicantsMessageModal = document.getElementById('noApplicantsMessageModal');
+            if (!applicantsModalHeader || !applicantsListDiv || !applicantsCountSpan || !noApplicantsMessageModal) return; // Defensive check
+
+            applicantsModalHeader.innerText = `Pelamar untuk: ${job.title}`;
+            applicantsListDiv.innerHTML = ''; // Clear previous list
+
+            var applicants = simulatedJobApplicants[jobId] || []; // Get applicants for this job
+
+            applicantsCountSpan.innerText = `Total: ${applicants.length} pelamar`;
+
+            if (applicants.length === 0) {
+                noApplicantsMessageModal.classList.remove('hidden');
+            } else {
+                noApplicantsMessageModal.classList.add('hidden');
+                applicants.forEach(applicant => {
+                    applicantsListDiv.innerHTML += `
+                        <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                            <p class="font-semibold text-gray-800">${applicant.name}</p>
+                            <p class="text-sm text-gray-600">Email: ${applicant.email}</p>
+                            <p class="text-sm text-gray-600">Jurusan: ${applicant.jurusan || '-'}</p>
+                            <p class="text-sm text-gray-600">CV: ${applicant.cv || '-'}</p>
+                            <div class="mt-2 flex space-x-2">
+                                <button class="btn-secondary px-3 py-1 text-xs" onclick="showModal('Detail Pelamar', 'Ini akan menampilkan detail lengkap dari ${applicant.name}.')">Lihat Detail</button>
+                                <button class="btn-primary px-3 py-1 text-xs" onclick="showModal('Jadwalkan Wawancara', 'Simulasi penjadwalan wawancara dengan ${applicant.name}.')">Jadwalkan Wawancara</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            document.getElementById('applicantsModal').classList.add('active');
+        }
+
+        function closeApplicantsModal() {
+            if(document.getElementById('applicantsModal')) document.getElementById('applicantsModal').classList.remove('active');
+        }
+
+
+        // Initial load and hash routing
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check for initial hash
+            var initialHash = window.location.hash.substring(1);
+            if (initialHash && document.getElementById(initialHash)) {
+                showPage(initialHash);
+            } else {
+                showPage('home'); // Default to home page
+            }
+
+            // Set initial filtered jobs for the search page
+            currentFilteredJobs = [...simulatedJobs];
+            updateAuthUI(); // Update auth UI on page load
+        });
+
+        // Listen for hash changes (back/forward browser buttons)
+        window.addEventListener('hashchange', () => {
+            var hash = window.location.hash.substring(1);
+            if (hash && document.getElementById(hash)) {
+                showPage(hash);
+            } else if (!hash) {
+                showPage('home'); // Go to home if hash is empty
+            }
+        });
+
+    </script>
+</body>
+</html>
